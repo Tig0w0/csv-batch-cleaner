@@ -4,7 +4,7 @@
 
 ![HTML report screenshot](assets/report-preview.png)
 
-> **Portfolio demonstration.** Real public-domain USGS earthquake data are combined with clearly identified *synthetic duplicates and deliberate errors*. No private client files are included.
+> **Portfolio demonstration, not a client project.** Three publicly released U.S. government datasets (USGS, NOAA, Census) are tested with **deliberately injected, labeled synthetic errors**. No real client data or client results are claimed.
 
 ## The problem
 
@@ -14,6 +14,7 @@ Manually opening multiple spreadsheet exports, copying rows, checking missing fi
 
 | Feature | Status |
 |---|---|
+| Drag-and-drop CSV/XLSX files or folders | Supported |
 | Batch import CSV and .xlsx | Supported |
 | Mixed CSV/XLSX input folder | Supported |
 | First worksheet of each .xlsx | Supported |
@@ -27,22 +28,20 @@ Manually opening multiple spreadsheet exports, copying rows, checking missing fi
 | No cloud uploads or paid APIs | Supported |
 | Original Excel styling, formulas, macros, pivot tables | **Not supported** |
 
-**Excel dependency:** only `openpyxl`; no pandas, cloud account or external services.
+**Dependencies:** `openpyxl` for Excel and `tkinterdnd2` for desktop drag-and-drop. No pandas, cloud account or external services.
 
-## Results with real English-language data
+## Reproducible portfolio tests
 
-The demo begins with **180 real observations** from the U.S. Geological Survey earthquake feed. We intentionally add **6 synthetic duplicates** and **9 synthetic invalid records** to test the quality checks. The program evaluates **195 rows**.
+The same processing engine was tested against **three distinct data schemas** using official source snapshots and separate, deliberately corrupted fixtures.
 
-| Outcome | Count |
-|---|---:|
-| Input files | 3 (2 CSV + 1 XLSX in the mixed demo) |
-| Total records | 195 |
-| Clean unique records | 180 |
-| Duplicates isolated | 6 |
-| Invalid records isolated | 9 |
-| Automated tests | 31 passing |
+| Case | Formats | Rows | Clean | Duplicates | Rejected |
+|---|---|---:|---:|---:|---:|
+| USGS earthquakes | 2 CSV + 1 XLSX | 195 | 180 | 6 | 9 |
+| NOAA daily weather | 2 CSV | 166 | 154 | 4 | 8 |
+| U.S. Census population | 1 XLSX | 221 | 208 | 4 | 9 |
+| **Total** | **6 files** | **582** | **542** | **14** | **26** |
 
-**All injected errors are synthetic.** The demo input and output files are not authoritative earthquake observations.
+**35 automated regression tests passed.** Three separate malformed-input checks also verified that no partial output is published. These tests demonstrate controlled input/output behavior, **not performance on large datasets or real client projects**. Source records and synthetic anomalies are kept separate; details and reproduction commands are in [TEST_CASES.md](TEST_CASES.md).
 
 ![Desktop GUI](assets/gui-preview.png)
 
@@ -60,12 +59,12 @@ On Windows, double-click `run_demo.bat` or run:
 python gui.py
 ```
 
-1. Select a folder with CSV and/or XLSX files.
-2. Select a separate results folder.
-3. Set a unique key (default: `id`), required columns, and numeric columns.
+1. **Drop** one or more CSV/XLSX files, folders, or a mixture onto the drop zone. Alternatively, select an input folder using **Browse**.
+2. Choose a separate results folder.
+3. Set the unique key (default: `id`), required columns, and numeric columns to match the input data.
 4. Click **Run Data Cleanup**, then **Open HTML report**.
 
-The desktop app opens with the included sample folder and its validation fields prefilled. **For your own files, adjust the required/numeric columns.** The CLI retains generic defaults: unique key `id`, required `id`, and no numeric validation.
+The desktop app opens with the included USGS sample folder and its validation fields prefilled. When you drop new files, those sample-specific validation defaults switch to generic `id` validation; **confirm the unique key and validation fields for your files**. Any custom rules already entered remain in place. Dropped folders contribute supported files directly inside the folder (not recursively); duplicates from overlapping selections are ignored. Drops never upload or copy your source files. The CLI retains generic defaults: unique key `id`, required `id`, and no numeric validation.
 
 ### CLI
 
@@ -85,16 +84,16 @@ python scripts/prepare_demo.py
 
 The three standardized sample files (two CSV, one XLSX) and output are included. Regeneration is optional. A separate demo-only processing mode is not needed.
 
-## More realistic test scenarios
+### Run all three cases
 
-The same cleaning engine was also tested on **two additional U.S. government datasets**: NOAA daily weather readings (CSV) and U.S. Census population estimates (converted to XLSX), plus the existing USGS earthquake sample.
-
-Across six files and **582 rows**, all three independent tests returned **542 clean / 14 duplicates / 26 rejected**; separate invalid-file tests also verified safe cancellation. Deliberately corrupted rows carry `synthetic_*` labels. See [TEST_CASES.md](TEST_CASES.md) for reproducible commands, exact cases, source links, limitations and results.
+The additional NOAA and Census snapshots and fixtures are already included, so downloading data is **not required** to run these tests:
 
 ```bash
-python scripts/prepare_extra_cases.py
 python scripts/run_test_cases.py
+python -m unittest discover -s tests -v
 ```
+
+To regenerate the optional test fixtures from the preserved snapshots, run `python scripts/prepare_extra_cases.py`. Separate results are placed in new folders each time.
 
 ## Outputs
 
@@ -140,21 +139,18 @@ cleaner.py            shared validation, deduplication and output reporting
 spreadsheet_io.py     CSV and XLSX reading / XLSX writing
 gui.py                Tkinter frontend
 cli.py                command-line frontend
-tests/                automated regression tests
-scripts/              single demo-data preparation script
+tests/                35 automated regression tests
+scripts/              reproducible data preparation and test runner
 data/source/          preserved original USGS feed snapshot
-data/input/           2 CSV + 1 XLSX examples
+data/input/           2 CSV + 1 XLSX USGS examples
+data/test_cases/      NOAA/Census source snapshots, fixtures, manifest and results
 data/output/          generated runtime folders (ignored by Git)
-data/example_output/  committed output from a successful mixed-format run
+data/example_output/  committed USGS sample outputs
 assets/               real screenshots of the GUI and report
 ```
 
 ## Source, license and attribution
 
-Example data: **U.S. Geological Survey (USGS), Earthquake Hazards Program**
-Data feed: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.csv
-USGS reuse guidance: https://www.usgs.gov/data-management/data-licensing
+Sources: **U.S. Geological Survey** earthquake observations, **NOAA/NCEI** daily station observations, and **U.S. Census Bureau** population estimates. See [DATA_SOURCES.md](DATA_SOURCES.md) and [TEST_CASES.md](TEST_CASES.md) for exact source URLs, dataset scope, reuse context and synthetic modifications.
 
-See [DATA_SOURCES.md](DATA_SOURCES.md) for licensing context, snapshot date and details of the **synthetic test anomalies**. The source code is licensed under MIT; the USGS data retain their original status and are not relicensed by our MIT license.
-
-This repository is an independent programming portfolio project and is not affiliated with or endorsed by the USGS.
+Code is MIT-licensed; that license does **not** relicense the source datasets. This independent portfolio project is not affiliated with or endorsed by any of the agencies.

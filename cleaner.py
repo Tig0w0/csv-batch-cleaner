@@ -82,17 +82,23 @@ def _write_csv(path: Path, fields: list[str], rows: list[dict[str, str]],
             writer.writerow(cells)
 
 
-def process(input_dir: str | Path, output_dir: str | Path,
+def process(input_dir: str | Path | list[str | Path], output_dir: str | Path,
             key: str = DEFAULT_KEY, required: str = DEFAULT_REQUIRED,
             numeric: str = DEFAULT_NUMERIC) -> Results:
-    source, target = Path(input_dir).resolve(), Path(output_dir).resolve()
-    if not source.is_dir():
-        raise ValueError("Input directory does not exist.")
-    if target == source or source in target.parents or target in source.parents:
+    target = Path(output_dir).resolve()
+    sources = ([Path(input_dir)] if isinstance(input_dir, (str, Path))
+               else [Path(p) for p in input_dir])
+    sources = [p.resolve() for p in sources]
+    if not sources or any(not p.exists() for p in sources):
+        raise ValueError("Input files or folders do not exist.")
+    folders = [p for p in sources if p.is_dir()]
+    if any(target == p or p in target.parents or target in p.parents for p in folders):
         raise ValueError("Input and output folders must be separate, non-nested directories.")
 
-    files = sorted(p for p in source.iterdir() if p.is_file()
-                   and p.suffix.lower() in (".csv", ".xlsx") and not p.name.startswith("~$"))
+    files = sorted({file for path in sources
+                    for file in (path.iterdir() if path.is_dir() else [path])
+                    if file.is_file() and file.suffix.lower() in (".csv", ".xlsx")
+                    and not file.name.startswith("~$")}, key=lambda p: str(p).casefold())
     if not files:
         raise ValueError("No CSV/XLSX files found in the input directory.")
     total_bytes = 0

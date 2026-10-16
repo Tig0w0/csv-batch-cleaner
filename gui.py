@@ -6,12 +6,13 @@ import webbrowser
 import threading
 from queue import Empty, Queue
 
-from cleaner import DEFAULT_KEY, process
+from tkinterdnd2 import DND_FILES, TkinterDnD
+from cleaner import DEFAULT_KEY, DEFAULT_REQUIRED, DEFAULT_NUMERIC, process
 
 ROOT = Path(__file__).resolve().parent
 
 
-class Window(tk.Tk):
+class Window(TkinterDnD.Tk):
     def __init__(self):
         super().__init__()
         self.title("CSV & Excel Cleaner | Local Automation")
@@ -25,6 +26,8 @@ class Window(tk.Tk):
         self.numeric_var = tk.StringVar(value="latitude,longitude,depth,magnitude")
         self.events = Queue()
         self.report_path = None
+        self.dropped = None
+        self.input_var.trace_add("write", lambda *_: setattr(self, "dropped", None))
         self._build()
 
     def _build(self):
@@ -32,9 +35,9 @@ class Window(tk.Tk):
         style.theme_use("clam")
         style.configure("TEntry", padding=9, relief="flat", borderwidth=1)
         style.configure("TButton", padding=9, font=("Segoe UI", 10))
-        outer = tk.Frame(self, bg="#f2f6fa", padx=34, pady=25)
+        outer = tk.Frame(self, bg="#f2f6fa", padx=34, pady=19)
         outer.pack(fill="both", expand=True)
-        header = tk.Frame(outer, bg="#14283b", padx=25, pady=22)
+        header = tk.Frame(outer, bg="#14283b", padx=25, pady=17)
         header.pack(fill="x", pady=(0, 20))
         tk.Label(header, text="LOCAL WORKFLOW AUTOMATION", bg="#14283b", fg="#78d6d9",
                  font=("Segoe UI", 10, "bold")).pack(anchor="w")
@@ -46,8 +49,14 @@ class Window(tk.Tk):
         form.pack(fill="x")
         self._folder(form, "INPUT FOLDER", self.input_var, 0)
         self._folder(form, "OUTPUT FOLDER", self.output_var, 1)
+        drop = tk.Label(form, text="Drop CSV / XLSX files or folders here",
+                        bg="#e8f5f5", fg="#176472", font=("Segoe UI", 11, "bold"),
+                        relief="groove", bd=1, pady=9)
+        drop.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(0, 12))
+        drop.drop_target_register(DND_FILES)
+        drop.dnd_bind("<<Drop>>", self._drop)
         options = tk.Frame(form, bg="#f2f6fa")
-        options.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(4, 12))
+        options.grid(row=3, column=0, columnspan=2, sticky="ew", pady=(2, 8))
         options.grid_columnconfigure(1, weight=1)
         for index, (title, variable) in enumerate([
             ("Unique key", self.key_var),
@@ -58,7 +67,7 @@ class Window(tk.Tk):
                      font=("Segoe UI", 10)).grid(row=index, column=0, sticky="w", pady=5, padx=(0, 18))
             ttk.Entry(options, textvariable=variable).grid(row=index, column=1, sticky="ew", pady=5)
         actions = tk.Frame(outer, bg="#f2f6fa")
-        actions.pack(fill="x", pady=(6, 12))
+        actions.pack(fill="x", pady=(4, 9))
         self.run_btn = tk.Button(actions, text="RUN DATA CLEANUP  →", bg="#047d89", fg="white",
                                  relief="flat", cursor="hand2", font=("Segoe UI", 11, "bold"),
                                  padx=24, pady=12, command=self._run)
@@ -83,12 +92,30 @@ class Window(tk.Tk):
             filedialog.askdirectory(initialdir=variable.get()) or variable.get()
         )).grid(row=1, column=1, padx=(8, 0), pady=(5, 0))
 
+    def _drop(self, event):
+        paths = [Path(p) for p in self.tk.splitlist(event.data)]
+        if not paths or any(not p.exists() or
+                            (p.is_file() and p.suffix.lower() not in (".csv", ".xlsx"))
+                            for p in paths):
+            messagebox.showerror("Unsupported drop", "Drop existing CSV/XLSX files or folders.")
+            return
+        if len(paths) == 1 and paths[0].is_dir():
+            self.input_var.set(str(paths[0]))
+        else:
+            self.input_var.set(f"{len(paths)} dropped item(s)")
+            self.dropped = [str(p) for p in paths]
+        if (self.required_var.get() == "id,time,latitude,longitude" and
+                self.numeric_var.get() == "latitude,longitude,depth,magnitude"):
+            self.required_var.set(DEFAULT_REQUIRED)
+            self.numeric_var.set(DEFAULT_NUMERIC)
+        self.status.set(f"Selected {len(paths)} item(s). Check the key and validation fields, then run.")
+
     def _run(self):
         self.report_path = None
         self.report_btn.configure(state="disabled")
         self.run_btn.configure(state="disabled")
         self.status.set("Processing input files...")
-        inputs = (self.input_var.get(), self.output_var.get(),
+        inputs = (self.dropped or self.input_var.get(), self.output_var.get(),
                   self.key_var.get(), self.required_var.get(), self.numeric_var.get())
 
         def worker():

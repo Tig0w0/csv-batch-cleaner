@@ -303,6 +303,32 @@ class CleaningTests(unittest.TestCase):
         self.assertEqual((result.input_files, result.processed_rows, result.clean_rows,
                           result.duplicate_rows, result.rejected_rows), (3, 195, 180, 6, 9))
 
+    def test_drop_file_path_as_direct_input(self):
+        write_csv(self.src / "first.csv", [["id", "name"], ["A", "Alpha"]])
+        write_csv(self.src / "excluded.csv", [["id", "name"], ["B", "Beta"]])
+        result = process(self.src / "first.csv", self.out)
+        self.assertEqual((result.input_files, result.clean_rows), (1, 1))
+
+    def test_drop_multiple_files_and_folders_without_repeating_inputs(self):
+        other = self.root / "with spaces"
+        other.mkdir()
+        write_csv(self.src / "first.csv", [["id", "name"], ["A", "Alpha"]])
+        write_csv(other / "second.csv", [["id", "name"], ["B", "Beta"]])
+        result = process([other / "second.csv", self.src, self.src / "first.csv"], self.out)
+        self.assertEqual((result.input_files, result.clean_rows), (2, 2))
+
+    def test_drop_folder_preserves_output_isolation(self):
+        write_csv(self.src / "first.csv", [["id"], ["A"]])
+        with self.assertRaisesRegex(ValueError, "separate"):
+            process([self.src], self.src / "results")
+
+    def test_drop_rejects_missing_or_empty_selection(self):
+        with self.assertRaisesRegex(ValueError, "do not exist"):
+            process([self.src / "absent.csv"], self.out)
+        with self.assertRaisesRegex(ValueError, "do not exist"):
+            process([], self.out)
+
+
 
 if __name__ == "__main__":
     unittest.main()
