@@ -10,3 +10,4 @@ venv/
 .DS_Store
 Thumbs.db
 .chrome-capture/
+data/output/

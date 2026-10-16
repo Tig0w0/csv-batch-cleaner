@@ -1,0 +1,66 @@
+event_id,time,latitude_deg,longitude_deg,depth,mag,location,status,type
+nm60628596,2026-10-14T13:31:12.510Z,36.759,-91.557,1.49,2.45,"4 km SSW of Thomasville, Missouri",reviewed,earthquake
+us6000u2a0,2026-10-14T13:19:07.599Z,38.6954,141.9302,56.594,4.4,"45 km SSE of Ōfunato, Japan",reviewed,earthquake
+aka2026ujeyit,2026-10-14T12:20:10.324Z,52.151,-174.306,195.4,3.5,"8 km SW of Atka, Alaska",reviewed,earthquake
+aka2026ujebcw,2026-10-14T11:53:26.013Z,61.878,-147.425,16.8,2.9,"14 km ENE of Glacier View, Alaska",automatic,earthquake
+us6000u292,2026-10-14T11:27:00.438Z,36.8994,-104.8335,5,2.6,"25 km S of Weston, Colorado",reviewed,earthquake
+us6000u2ah,2026-10-14T11:20:54.323Z,51.503,176.9027,7.962,3.9,"294 km ESE of Attu Station, Alaska",reviewed,earthquake
+us6000u28y,2026-10-14T10:49:47.588Z,-20.9899,-178.7711,585.07,5.9,Fiji region,reviewed,earthquake
+pr71536683,2026-10-14T09:57:06.030Z,18.875333333333,-64.296,76.09,3.23,"79 km NE of Cruz Bay, U.S. Virgin Islands",reviewed,earthquake
+us6000u28m,2026-10-14T09:56:16.664Z,65.2872,-162.8796,10,2.6,"71 km NNE of White Mountain, Alaska",reviewed,earthquake
+us6000u28e,2026-10-14T09:16:18.828Z,-5.4767,35.0428,10,4.6,"42 km NNE of Kilimatinde, Tanzania",reviewed,earthquake
+us6000u28d,2026-10-14T09:00:27.870Z,32.3496,-104.4747,8.189,3.1,"21 km NNW of Whites City, New Mexico",reviewed,earthquake
+uw714119552,2026-10-14T09:00:04.270Z,47.422166666667,-121.825,19.08,2.65,"5 km WSW of Wilderness Rim, Washington",reviewed,earthquake
+pr71536668,2026-10-14T08:10:16.300Z,18.181166666667,-67.247666666667,19.21,2.84,"11 km W of Mayagüez, Puerto Rico",reviewed,earthquake
+us6000u27u,2026-10-14T06:27:06.453Z,-5.443,152.2617,35,4.9,"121 km S of Kokopo, Papua New Guinea",reviewed,earthquake
+us6000u27j,2026-10-14T05:09:35.397Z,7.5657,-80.6021,10,4.7,"10 km S of La Mesa, Panama",reviewed,earthquake
+us6000u27i,2026-10-14T04:50:59.720Z,54.9935,-160.4145,49.214,3.4,"38 km S of Sand Point, Alaska",reviewed,earthquake
+aka2026uioapb,2026-10-14T03:53:48.898Z,60.996,-151.068,65.6,3.2,"8 km SSE of Tyonek, Alaska",automatic,earthquake
+us6000u272,2026-10-14T03:11:09.258Z,-20.3552,-70.2699,44.914,4.9,"16 km WSW of La Tirana, Chile",reviewed,earthquake
+us6000u273,2026-10-14T03:02:14.593Z,5.0056,-27.5843,10,4.8,North Atlantic Ocean,reviewed,earthquake
+us6000u271,2026-10-14T02:59:27.574Z,-5.4957,152.3942,10,4.7,"128 km S of Kokopo, Papua New Guinea",reviewed,earthquake
+us6000u26u,2026-10-14T02:12:14.885Z,-4.4488,152.9436,10,4.6,"75 km E of Kokopo, Papua New Guinea",reviewed,earthquake
+us6000u26f,2026-10-14T00:36:45.416Z,-29.219,-71.9168,10,5,"98 km NW of Coquimbo, Chile",reviewed,earthquake
+us6000u26c,2026-10-14T00:30:47.706Z,-29.2155,-71.8024,21.947,5.1,"93 km NNW of Coquimbo, Chile",reviewed,earthquake
+ci41347255,2026-10-13T23:59:55.930Z,33.365166666667,-116.4115,11.31,2.46,"13 km NNW of Borrego Springs, CA",reviewed,earthquake
+tx2026ueznej,2026-10-13T23:54:43.577Z,31.722,-104.3,6.6638,2.6,"50 km S of Whites City, New Mexico",reviewed,earthquake
+pr71536653,2026-10-13T23:29:55.680Z,18.562666666667,-67.003,21.72,2.83,"7 km NNE of Isabela, Puerto Rico",reviewed,earthquake
+us6000u265,2026-10-13T23:26:52.460Z,-21.8365,-68.7527,124.331,4.4,"70 km NNE of Calama, Chile",reviewed,earthquake
+us6000u25y,2026-10-13T22:39:00.232Z,32.3762,-104.478,10,3.6,"23 km WSW of Carlsbad, New Mexico",reviewed,earthquake
+us6000u25i,2026-10-13T21:24:21.135Z,6.7888,-73.0065,162.209,4.8,"5 km NW of Cepitá, Colombia",reviewed,earthquake
+hv75055482,2026-10-13T19:27:58.120Z,19.310166666667,-155.00016666667,34.29,2.72,"19 km SSW of Leilani Estates, Hawaii",reviewed,earthquake
+us6000u24c,2026-10-13T18:45:03.231Z,-5.4832,152.1364,20.842,6,"126 km S of Kokopo, Papua New Guinea",reviewed,earthquake
+us6000u24a,2026-10-13T18:36:38.928Z,1.6816,-76.3106,10,4.4,"20 km WSW of Palestina, Colombia",reviewed,earthquake
+nc75448936,2026-10-13T18:28:09.450Z,35.779666900635,-121.46183013916,-0.31999999284744,2.57,"28 km SSE of Lopez Point, CA",automatic,earthquake
+us6000u23d,2026-10-13T16:28:15.172Z,-5.4453,152.1025,36.991,5.1,"123 km S of Kokopo, Papua New Guinea",reviewed,earthquake
+pr2026286000,2026-10-13T15:55:16.640Z,18.4615,-68.8911,117,3.87,"9 km ENE of La Romana, Dominican Republic",reviewed,earthquake
+us6000u21y,2026-10-13T15:21:44.242Z,5.3478,125.5183,65.699,4.8,"8 km SE of Sarangani, Philippines",reviewed,earthquake
+us6000u21s,2026-10-13T14:36:12.242Z,-5.5103,152.1283,29.792,5.3,"129 km S of Kokopo, Papua New Guinea",reviewed,earthquake
+aka2026uhnbig,2026-10-13T14:24:13.863Z,60.663,-150.985,55.5,2.5,"15 km NNE of Ridgeway, Alaska",automatic,earthquake
+ci41347047,2026-10-13T13:55:45.280Z,36.025166666667,-117.78083333333,1.72,2.71,"15 km NE of Little Lake, CA",reviewed,earthquake
+us6000u21d,2026-10-13T12:51:32.169Z,7.7902,-81.6085,10,4.5,"26 km SSW of Zapotillo, Panama",reviewed,earthquake
+us6000u219,2026-10-13T12:38:04.963Z,-25.7094,-70.6778,32.198,4.1,"38 km SSW of Taltal, Chile",reviewed,earthquake
+us6000u214,2026-10-13T12:23:07.248Z,-0.4085,-19.4308,10,6.8,central Mid-Atlantic Ridge,reviewed,earthquake
+us6000u211,2026-10-13T12:12:46.978Z,36.5385,70.8791,188.82,4.3,"36 km S of Jurm, Afghanistan",reviewed,earthquake
+us6000u20z,2026-10-13T12:05:41.519Z,51.6162,159.9496,10,4.9,"180 km SE of Vilyuchinsk, Russia",reviewed,earthquake
+pr71536588,2026-10-13T11:41:02.180Z,19.118,-68.4885,21.94,3.37,"54 km NNE of Otra Banda, Dominican Republic",reviewed,earthquake
+us6000u20t,2026-10-13T11:20:04.077Z,-0.4259,-80.3128,38.884,4.4,"22 km NNE of Bahía de Caráquez, Ecuador",reviewed,earthquake
+pr71536583,2026-10-13T10:41:08.310Z,18.534833333333,-66.975166666667,16.8,2.72,"6 km NE of Isabela, Puerto Rico",reviewed,earthquake
+nc75448751,2026-10-13T10:15:48.040Z,40.286998748779,-124.50350189209,9.4300003051758,2.66,"19 km WSW of Petrolia, CA",automatic,earthquake
+nc75448746,2026-10-13T10:06:58.730Z,40.470832824707,-124.88416290283,18.280000686646,2.47,"53 km WNW of Petrolia, CA",automatic,earthquake
+us6000u20i,2026-10-13T09:48:28.205Z,-9.9266,118.8246,35,4.5,"71 km SW of Tambolaka, Indonesia",reviewed,earthquake
+us6000u20g,2026-10-13T09:41:12.899Z,38.5166,68.8922,10,4.7,"9 km NE of Boshkengash, Tajikistan",reviewed,earthquake
+us6000u207,2026-10-13T08:38:28.325Z,-28.556,-12.5205,10,5.3,southern Mid-Atlantic Ridge,reviewed,earthquake
+aka2026uhbeyn,2026-10-13T08:28:51.577Z,62.296,-151.351,98.9,3,"34 km N of Skwentna, Alaska",automatic,earthquake
+us6000u200,2026-10-13T08:15:04.080Z,38.8294,104.9421,10,4.6,"63 km W of Bayan Hot, China",reviewed,earthquake
+aka2026ugxyux,2026-10-13T06:51:32.555Z,56.827,-155.658,1.2,2.8,"91 km W of Akhiok, Alaska",automatic,earthquake
+us6000u1zh,2026-10-13T06:39:04.944Z,7.7685,-81.4531,10,4.7,"14 km WNW of Río Grande, Panama",reviewed,earthquake
+pr71536573,2026-10-13T06:05:45.670Z,18.542,-66.631333333333,13.49,2.86,"10 km N of Animas, Puerto Rico",reviewed,earthquake
+us6000u1zc,2026-10-13T06:01:24.155Z,19.6853,120.7047,10,4.7,"124 km N of Pagudpud, Philippines",reviewed,earthquake
+us6000u1z5,2026-10-13T05:44:46.919Z,0.1685,-19.8598,10,6.7,central Mid-Atlantic Ridge,reviewed,earthquake
+us6000u1yx,2026-10-13T05:28:18.605Z,7.4834,-79.9181,10,4.4,"13 km ESE of Pedasí, Panama",reviewed,earthquake
+nm60628596,2026-10-14T13:31:12.510Z,36.759,-91.557,1.49,2.45,"4 km SSW of Thomasville, Missouri",reviewed,earthquake
+us6000u2a0,2026-10-14T13:19:07.599Z,38.6954,141.9302,56.594,4.4,"45 km SSE of Ōfunato, Japan",reviewed,earthquake
+,2026-10-14T10:49:47.588Z,-20.9899,-178.7711,585.07,5.9,Fiji region,reviewed,earthquake
+synthetic-invalid-1-1,2026-10-14T09:57:06.030Z,not-a-number,-64.296,76.09,3.23,"79 km NE of Cruz Bay, U.S. Virgin Islands",reviewed,earthquake
+synthetic-invalid-1-2,,65.2872,-162.8796,10,2.6,"71 km NNE of White Mountain, Alaska",reviewed,earthquake

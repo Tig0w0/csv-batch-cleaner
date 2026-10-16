@@ -1,26 +1,23 @@
-# Upwork portfolio entry (ready to copy)
+# Upwork portfolio entry — draft, not submitted
 
-**Title:** Python CSV Automation | Data Cleaning & Reporting
+**Title:** Python Excel & CSV Automation | Cleaning & Reporting
 
 **Project description:**
 
-Built a lightweight Python tool that automates repetitive spreadsheet data cleanup.
+Built an offline Python automation tool that merges multiple CSV and Excel (XLSX) files, standardizes column names, validates required and numeric fields, removes duplicate records, and generates reviewable reports.
 
-It merges CSV files, standardizes inconsistent column names, removes duplicate records, validates required fields and numeric values, and generates clean CSV exports with a visual HTML audit report.
+The tool includes a Windows-friendly desktop GUI, a command-line interface, and a visual HTML data-quality dashboard. Each run safely writes a fresh folder of cleaned, duplicate, and rejected results in both CSV and XLSX formats.
 
-To demonstrate accuracy, I used real public-domain data from the U.S. Geological Survey and intentionally added duplicate and invalid test records. The tool correctly processed 195 records, retained 180 clean records, isolated 6 duplicates and flagged 9 invalid rows. All six automated unit tests passed.
+For a reproducible demonstration, I used public-domain USGS earthquake data and intentionally inserted synthetic errors. The program processed 195 records, retained 180 clean observations, isolated 6 duplicates, and flagged 9 invalid records. Nineteen automated regression tests passed.
 
-The tool runs locally without cloud services or paid APIs and includes a simple desktop interface and command-line workflow.
+The workflow runs locally without paid APIs or uploads to external services. It is designed for clearly scoped spreadsheet cleanup projects and can be adapted to specific client file schemas.
 
-**Skills:** Python, Data Cleaning, CSV, Data Processing, Automation, Data Validation
+**Skills:** Python, Excel, CSV, Data Cleaning, Data Validation, Data Processing, Automation, OpenPyXL
 
-**My role:** Design, implementation, testing, documentation, GUI and reproducible dataset preparation.
+**My role:** Architecture, coding, GUI, dataset preparation, regression tests, documentation, reporting.
 
-**Repository:** https://github.com/Tig0w0/csv-batch-cleaner
+**Public repository:** https://github.com/Tig0w0/csv-batch-cleaner
 
-**Suggested attachments:**
-1. `assets/report-preview.png` — visual result of automated cleanup
-2. `assets/gui-preview.png` — local application UI
-3. GitHub README link — source code, run instructions and unit tests
+**Suggested media:** `assets/gui-preview.png`, `assets/report-preview.png`, source and output example files.
 
-**Disclosure:** Portfolio demonstration; synthetic errors added solely for testing. Not an official USGS product.
+**Disclosure:** This is a portfolio prototype, not an official USGS product. Deliberate quality issues are synthetic.

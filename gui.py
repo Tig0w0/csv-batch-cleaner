@@ -3,8 +3,11 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import webbrowser
+import threading
+from queue import Empty, Queue
 
-from cleaner import process
+from cleaner import (DEFAULT_KEY, DEFAULT_REQUIRED, DEFAULT_NUMERIC,
+                     DEMO_REQUIRED, DEMO_NUMERIC, process)
 
 ROOT = Path(__file__).resolve().parent
 
@@ -12,15 +15,16 @@ ROOT = Path(__file__).resolve().parent
 class Window(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("CSV Batch Cleaner | Local Automation")
+        self.title("CSV & Excel Cleaner | Local Automation")
         self.geometry("760x700")
         self.minsize(660, 650)
         self.configure(bg="#f2f6fa")
         self.input_var = tk.StringVar(value=str(ROOT / "data" / "input"))
         self.output_var = tk.StringVar(value=str(ROOT / "data" / "output"))
-        self.key_var = tk.StringVar(value="id")
-        self.required_var = tk.StringVar(value="id,time,latitude,longitude")
-        self.numeric_var = tk.StringVar(value="latitude,longitude,depth,magnitude")
+        self.key_var = tk.StringVar(value=DEFAULT_KEY)
+        self.required_var = tk.StringVar(value=DEFAULT_REQUIRED)
+        self.numeric_var = tk.StringVar(value=DEFAULT_NUMERIC)
+        self.events = Queue()
         self.report_path = None
         self._build()
 
@@ -35,7 +39,7 @@ class Window(tk.Tk):
         header.pack(fill="x", pady=(0, 20))
         tk.Label(header, text="LOCAL WORKFLOW AUTOMATION", bg="#14283b", fg="#78d6d9",
                  font=("Segoe UI", 10, "bold")).pack(anchor="w")
-        tk.Label(header, text="CSV Batch Cleaner", bg="#14283b", fg="white",
+        tk.Label(header, text="CSV & Excel Cleaner", bg="#14283b", fg="white",
                  font=("Segoe UI", 23, "bold")).pack(anchor="w", pady=(3, 2))
         tk.Label(header, text="Merge · Validate · Deduplicate · Export report",
                  bg="#14283b", fg="#b9ceda", font=("Segoe UI", 10)).pack(anchor="w")
@@ -62,10 +66,11 @@ class Window(tk.Tk):
         self.run_btn.pack(side="left")
         self.report_btn = ttk.Button(actions, text="Open HTML report", command=self._report, state="disabled")
         self.report_btn.pack(side="left", padx=12)
+        ttk.Button(actions, text="Use USGS demo rules", command=self._demo).pack(side="left")
         self.status = tk.StringVar(value="Ready. Your files remain on this computer.")
         tk.Label(outer, textvariable=self.status, bg="#f2f6fa", fg="#526b7b",
                  wraplength=650, justify="left", font=("Segoe UI", 10)).pack(anchor="w")
-        tk.Label(outer, text="100% offline · Python standard library · No paid APIs",
+        tk.Label(outer, text="100% offline · Python + openpyxl · No paid APIs",
                  bg="#f2f6fa", fg="#708596", font=("Segoe UI", 9)).pack(side="bottom", anchor="w")
 
     def _folder(self, parent, title, variable, row):
@@ -80,21 +85,45 @@ class Window(tk.Tk):
             filedialog.askdirectory(initialdir=variable.get()) or variable.get()
         )).grid(row=1, column=1, padx=(8, 0), pady=(5, 0))
 
+    def _demo(self):
+        self.key_var.set(DEFAULT_KEY)
+        self.required_var.set(DEMO_REQUIRED)
+        self.numeric_var.set(DEMO_NUMERIC)
+        self.status.set("USGS demo checks loaded. Choose Run Data Cleanup.")
+
     def _run(self):
+        self.report_path = None
+        self.report_btn.configure(state="disabled")
         self.run_btn.configure(state="disabled")
-        self.update_idletasks()
+        self.status.set("Processing input files...")
+        inputs = (self.input_var.get(), self.output_var.get(),
+                  self.key_var.get(), self.required_var.get(), self.numeric_var.get())
+
+        def worker():
+            try:
+                self.events.put(("ok", process(*inputs)))
+            except Exception as exc:
+                self.events.put(("error", str(exc)))
+
+        threading.Thread(target=worker, daemon=True).start()
+        self.after(100, self._poll)
+
+    def _poll(self):
         try:
-            result = process(self.input_var.get(), self.output_var.get(),
-                             self.key_var.get(), self.required_var.get(), self.numeric_var.get())
-            self.report_path = Path(result.output_directory) / "report.html"
-            self.status.set(f"Complete: {result.clean_rows} clean / {result.duplicate_rows} duplicates / "
-                            f"{result.rejected_rows} rejected, from {result.input_files} CSV files.")
-            self.report_btn.configure(state="normal")
-        except Exception as exc:
-            self.status.set("Processing failed; please check your input settings.")
-            messagebox.showerror("CSV Batch Cleaner", str(exc))
-        finally:
-            self.run_btn.configure(state="normal")
+            status, result = self.events.get_nowait()
+        except Empty:
+            self.after(100, self._poll)
+            return
+        self.run_btn.configure(state="normal")
+        if status == "error":
+            self.status.set("Processing failed; previous results have not been overwritten.")
+            messagebox.showerror("CSV Batch Cleaner", result)
+            return
+        self.report_path = Path(result.output_directory) / "report.html"
+        self.status.set(f"Complete: {result.clean_rows} clean / {result.duplicate_rows} duplicates / "
+                        f"{result.rejected_rows} rejected, from {result.input_files} files. "
+                        f"Results: {result.output_directory}")
+        self.report_btn.configure(state="normal")
 
     def _report(self):
         if self.report_path:

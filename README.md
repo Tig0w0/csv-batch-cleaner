@@ -1,132 +1,150 @@
-# CSV Batch Cleaner
+# CSV & Excel Batch Cleaner
 
-**Offline CSV automation that merges files, standardizes columns, detects duplicate records, validates data and exports an audit-friendly HTML report.** Built in Python with **zero third-party packages**.
+**Offline Python automation for merging CSV/XLSX exports, validating records, detecting duplicates, and generating an audit-friendly HTML report.** A small desktop GUI and CLI use the **same processing engine**.
 
-![Processing report preview](assets/report-preview.png)
+![HTML report screenshot](assets/report-preview.png)
 
-> **Portfolio project.** The included example uses an actual public-domain USGS dataset, plus *clearly labeled synthetic issues* to demonstrate validation. No confidential customer data, paid API, or external upload is required.
+> **Portfolio demonstration.** Real public-domain USGS earthquake data are combined with clearly identified *synthetic duplicates and deliberate errors*. No private client files are included.
 
-## Why this helps
+## The problem
 
-Manually combining weekly CSV exports is repetitive and error-prone. CSV Batch Cleaner lets a client select an input folder, click **Run Data Cleanup**, and receive separated deliverables that make bad or repeated rows easy to inspect.
+Manually opening multiple spreadsheet exports, copying rows, checking missing fields, and removing duplicate records is slow and error-prone. This utility processes a folder of files and produces consistent reviewable outputs while preserving the original inputs.
 
-| Capability | Implemented |
+## Features
+
+| Feature | Status |
 |---|---|
-| Merge all CSV files in a folder | Yes |
-| Normalize inconsistent column names | Yes |
-| Find duplicates using a chosen unique ID | Yes |
-| Validate required fields | Yes |
-| Detect invalid numeric values | Yes |
-| Record originating filename and row | Yes |
-| Export accepted, duplicate and rejected records separately | Yes |
-| Generate shareable HTML report and JSON statistics | Yes |
-| Windows desktop GUI and command-line use | Yes |
-| Native Excel `.xlsx` import/export | **Not implemented** — use Excel's **CSV** export |
+| Batch import CSV and .xlsx | Supported |
+| Mixed CSV/XLSX input folder | Supported |
+| First worksheet of each .xlsx | Supported |
+| Header normalization and known aliases | Supported |
+| Required-field and numeric validation | Supported |
+| Case-insensitive deduplication using an ID column | Supported |
+| Source filename and original row tracking | Supported |
+| Cleaned, duplicate, and rejected CSV **and XLSX** files | Supported |
+| Standalone HTML quality report and JSON summary | Supported |
+| Windows GUI and scriptable CLI | Supported |
+| No cloud uploads or paid APIs | Supported |
+| Original Excel styling, formulas, macros, pivot tables | **Not supported** |
 
-## Live-demo results
+**Excel dependency:** only `openpyxl`; no pandas, cloud account or external services.
 
-Using **180 real USGS earthquake observations** split into three CSVs, the preparation script also inserts **6 synthetic duplicates** and **9 synthetic invalid rows**. The resulting batch has **195 records**.
+## Results with real English-language data
 
-| Metric | Result |
+The demo begins with **180 real observations** from the U.S. Geological Survey earthquake feed. We intentionally add **6 synthetic duplicates** and **9 synthetic invalid records** to test the quality checks. The program evaluates **195 rows**.
+
+| Outcome | Count |
 |---|---:|
-| Files merged | 3 |
-| Rows scanned | 195 |
-| Valid unique rows | 180 |
+| Input files | 3 (2 CSV + 1 XLSX in the mixed demo) |
+| Total records | 195 |
+| Clean unique records | 180 |
 | Duplicates isolated | 6 |
-| Invalid rows isolated | 9 |
-| Automated unit tests | 6 passing |
+| Invalid records isolated | 9 |
+| Automated tests | 19 passing |
 
-### Screenshots
+**All injected errors are synthetic.** The demo input and output files are not authoritative earthquake observations.
 
-![Desktop application](assets/gui-preview.png)
+![Desktop GUI](assets/gui-preview.png)
 
-![HTML audit report](assets/report-preview.png)
+## Install and run
 
-## Quick start — GUI (Windows, macOS, Linux)
-
-1. Install **Python 3.10 or newer**. No `pip install` needed.
-2. Download the repository.
-3. Run `python gui.py` (or double-click `run_demo.bat` on Windows).
-4. Choose input and output folders, then click **Run Data Cleanup**.
-5. Open `report.html` in the output directory.
-
-The included demo folders and validation fields are filled in by default.
-
-## CLI example
+Requires **Python 3.10+**.
 
 ```bash
-python cli.py --input data/input --output data/output --key id \
+python -m pip install -r requirements.txt
+```
+
+On Windows, double-click `run_demo.bat` or run:
+
+```bash
+python gui.py
+```
+
+1. Select a folder with CSV and/or XLSX files.
+2. Select a separate results folder.
+3. Set a unique key (default: `id`), required columns, and numeric columns.
+4. For the USGS sample only, click **Use USGS demo rules**.
+5. Click **Run Data Cleanup**, then **Open HTML report**.
+
+The default rules are general: unique key `id`, required column `id`, and no numeric columns. The USGS demo preset applies strict earthquake-field validation instead.
+
+### CLI
+
+```bash
+python cli.py --input data/mixed_input --output data/output --key id \
   --required id,time,latitude,longitude \
   --numeric latitude,longitude,depth,magnitude
 ```
 
-**Custom business CSVs:** Replace the demo input files with your own CSV exports, choose a unique column (e.g. `order_id`), and adjust required/numeric fields. Header names are normalized to snake_case; `Event ID`, `event_id` and `ID` all map to `id` in the demonstration. When files have incompatible schemas, the union of their columns is retained.
+For another business export, change the input/output directory and validation field names. **Every configured required or numeric column must exist in each source file.** When column names differ, normalize them before processing or add explicit aliases in `cleaner.py`.
 
-**Generated outputs:**
-- `cleaned.csv`: accepted unique rows.
-- `duplicates.csv`: extra copies, with a duplicate reason.
-- `rejected.csv`: missing values, invalid numbers or malformed rows, with reasons.
-- `summary.json`: counts, parameters and issue breakdown.
-- `report.html`: ready-to-view local audit dashboard.
-
-The HTML report links directly to the CSV/JSON files beside it. Source filename and source row are retained in every output.
-
-## Verify the example
+### Prepare the mixed demo
 
 ```bash
 python scripts/prepare_demo.py
-python -m unittest discover -s tests -v
-python cli.py --input data/input --output data/output --key id --required id,time,latitude,longitude --numeric latitude,longitude,depth,magnitude
+python scripts/prepare_mixed_demo.py
 ```
 
-The source snapshot is committed in `data/source/` so the example can be reproduced even after the USGS live feed changes. The example intentionally modifies some rows: **do not use `data/input/` or `data/output/` as authoritative earthquake records**.
+The sample data and output are included in the repository. Regeneration is optional.
 
-## How it works
+## Outputs
+
+Every run creates a **new subfolder** under the requested output folder, such as `data/output/run_20261016_120000_a1b2c3/`. Existing runs are never overwritten.
+
+| Output | Purpose |
+|---|---|
+| `cleaned.csv` / `cleaned.xlsx` | Valid unique records |
+| `duplicates.csv` / `duplicates.xlsx` | Extra records sharing the same ID |
+| `rejected.csv` / `rejected.xlsx` | Records failing required/numeric/CSV-format checks |
+| `summary.json` | Processing totals and issue breakdown |
+| `report.html` | Visual summary with links to generated outputs |
+
+The original input files are never modified. Results are written to a staging directory first and published as a complete run folder only after every output is created successfully.
+
+## Scope and limitations
+
+- The tool processes only `.csv` and `.xlsx`, not legacy `.xls` or macro-enabled `.xlsm`.
+- For each XLSX file it reads the first worksheet. Formulas are **not calculated** and are rejected if present in input data. Data should be exported as values.
+- Input Excel formatting, images, and embedded objects are not carried into cleaned output; the utility produces new flat tables.
+- The per-file input limit is 20MB and the combined input limit is 100MB. Row results are stored in memory for final export, so very large projects may need a streaming/database approach.
+- Duplicate detection uses a single user-selected normalized column; it is not fuzzy matching.
+- Empty numeric cells are allowed unless the corresponding column is also marked required.
+- A malformed CSV syntax error aborts processing without publishing a partial output folder. Rows with the wrong number of fields are sent to rejected outputs when they can be parsed.
+- Header mapping is deterministic, not AI-driven. The small included alias table is designed around the USGS demonstration.
+- CSV and XLSX outputs protect text resembling spreadsheet formulas by escaping them.
+- Output files are created locally; the app does not contact any remote service.
+
+## Testing
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Tests cover CSV/XLSX input, numeric conversion, missing configured columns, duplicate ID detection, invalid CSV syntax, spreadsheet formula safety, output folder isolation, malformed row traceability and validation defaults.
+
+## Repository structure
 
 ```text
-Source CSVs (different column names)
-            |
-            v
-     Header normalization
-            |
-            v
-   Required + numeric checks
-          /   \
-         v     v
-     Rejected  Valid
-                  |
-                  v
-          Deduplication by ID
-             /       \
-            v         v
-       Duplicates   Cleaned
-             \       /
-              v     v
-           JSON + HTML report
+cleaner.py            shared validation, deduplication and output reporting
+spreadsheet_io.py     CSV and XLSX reading / XLSX writing
+gui.py                Tkinter frontend
+cli.py                command-line frontend
+tests/                automated regression tests
+scripts/              demo data preparation and GUI screenshot helper
+data/source/          preserved original USGS feed snapshot
+data/input/           reproducible CSV examples
+data/mixed_input/     2 CSV + 1 XLSX examples
+data/output/          generated runtime folders (ignored by Git)
+data/example_output/  committed output from a successful mixed-format run
+assets/               real screenshots of the GUI and report
 ```
 
-## Security, caveats and scope
+## Source, license and attribution
 
-- Entirely offline while processing; no telemetry or cloud storage.
-- Inputs are CSV files of up to 20 MB **each**; larger batches should use a streaming implementation.
-- The unique key must exist in every input CSV; otherwise the run stops with a clear error.
-- The first valid record for each case-insensitive unique ID is kept. There is no complex reconciliation or fuzzy matching.
-- The app does not modify input files. It writes five named output files; **rerunning into the same output directory replaces these generated outputs**.
-- CSV formula-like text is escaped when exported to spreadsheet applications.
-- For actual paid client work, confirm the column mapping, acceptance rules, data sensitivity and required deliverables before processing.
+Example data: **U.S. Geological Survey (USGS), Earthquake Hazards Program**
+Data feed: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.csv
+USGS reuse guidance: https://www.usgs.gov/data-management/data-licensing
 
-## Data provenance and rights
+See [DATA_SOURCES.md](DATA_SOURCES.md) for licensing context, snapshot date and details of the **synthetic test anomalies**. The source code is licensed under MIT; the USGS data retain their original status and are not relicensed by our MIT license.
 
-Example data: **U.S. Geological Survey (USGS) Earthquake Hazards Program**  
-Download source: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.csv  
-USGS data use policy: https://www.usgs.gov/data-management/data-licensing
-
-USGS-created government works are generally U.S. public domain, and USGS recommends CC0 for its fully USGS-produced datasets. See [DATA_SOURCES.md](DATA_SOURCES.md) for the exact snapshot details and licensing caveat. Credit: U.S. Geological Survey. Our source code is separately licensed under **MIT**; the included USGS data are not relicensed under MIT.
-
-## Portfolio positioning
-
-**Python CSV Data Automation | Cleaning, Deduplication & Reporting**
-
-A small, clearly scoped, reproducible automation project demonstrating Python scripting, error handling, data validation, traceable outputs, unit testing and a usable desktop interface.
-
-Created as a software portfolio demonstration, not as an official USGS product.
+This repository is an independent programming portfolio project and is not affiliated with or endorsed by the USGS.
