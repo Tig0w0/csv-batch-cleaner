@@ -1,0 +1,39 @@
+{
+  "input_files": 3,
+  "processed_rows": 195,
+  "clean_rows": 180,
+  "duplicate_rows": 6,
+  "rejected_rows": 9,
+  "columns": [
+    "id",
+    "time",
+    "latitude",
+    "longitude",
+    "depth",
+    "magnitude",
+    "place",
+    "status",
+    "type"
+  ],
+  "required": [
+    "id",
+    "time",
+    "latitude",
+    "longitude"
+  ],
+  "numeric": [
+    "latitude",
+    "longitude",
+    "depth",
+    "magnitude"
+  ],
+  "dedupe_key": "id",
+  "issues": {
+    "duplicate_id": 6,
+    "invalid_number_latitude": 3,
+    "missing_id": 3,
+    "missing_time": 3
+  },
+  "created_utc": "2026-10-16T03:19:07+00:00",
+  "output_directory": "C:\\automation\\csv-cleaner-portfolio\\data\\output"
+}

@@ -1,0 +1,10 @@
+﻿id,time,latitude,longitude,depth,magnitude,place,status,type,__source_file,__source_row,__issue
+,2026-10-15T21:29:07.770Z,13.8226,-91.9535,35.809,4.4,"52 km S of Champerico, Guatemala",reviewed,earthquake,usgs_batch_01.csv,64,missing_id
+synthetic-invalid-0-1,2026-10-15T21:12:28.970Z,not-a-number,-67.944833333333,10.42,3.44,"65 km NE of Punta Cana, Dominican Republic",reviewed,earthquake,usgs_batch_01.csv,65,invalid_number_latitude
+synthetic-invalid-0-2,,13.9013,-91.8178,59.487,4.5,"44 km SSE of Champerico, Guatemala",reviewed,earthquake,usgs_batch_01.csv,66,missing_time
+,2026-10-14T10:49:47.588Z,-20.9899,-178.7711,585.07,5.9,Fiji region,reviewed,earthquake,usgs_batch_02.csv,64,missing_id
+synthetic-invalid-1-1,2026-10-14T09:57:06.030Z,not-a-number,-64.296,76.09,3.23,"79 km NE of Cruz Bay, U.S. Virgin Islands",reviewed,earthquake,usgs_batch_02.csv,65,invalid_number_latitude
+synthetic-invalid-1-2,,65.2872,-162.8796,10,2.6,"71 km NNE of White Mountain, Alaska",reviewed,earthquake,usgs_batch_02.csv,66,missing_time
+,2026-10-13T02:16:57.992Z,-58.1423,-26.2058,139.58,4.5,South Sandwich Islands region,reviewed,earthquake,usgs_batch_03.csv,64,missing_id
+synthetic-invalid-2-1,2026-10-13T01:44:23.964Z,not-a-number,-73.4058,25.568,4,"62 km NW of Tomé, Chile",reviewed,earthquake,usgs_batch_03.csv,65,invalid_number_latitude
+synthetic-invalid-2-2,,19.361166666667,-155.08033333333,6.06,3.13,"12 km SSE of Fern Forest, Hawaii",reviewed,earthquake,usgs_batch_03.csv,66,missing_time

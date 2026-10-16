@@ -1,0 +1,181 @@
+﻿id,time,latitude,longitude,depth,magnitude,place,status,type,__source_file,__source_row
+aka2026umcroy,2026-10-16T02:12:10.856Z,55.335,-158.082,5,3.4,"92 km SE of Perryville, Alaska",automatic,earthquake,usgs_batch_01.csv,2
+us6000u2me,2026-10-16T01:50:44.178Z,7.6075,-80.9467,10,4.4,"12 km SSE of Tebario, Panama",reviewed,earthquake,usgs_batch_01.csv,3
+aka2026ulyxqn,2026-10-16T00:18:28.188Z,57.863,-154.343,59,2.6,"33 km NNE of Karluk, Alaska",automatic,earthquake,usgs_batch_01.csv,4
+aka2026ulylmf,2026-10-16T00:04:22.449Z,60.745,-151.267,65.5,3.1,"6 km N of Nikiski, Alaska",automatic,earthquake,usgs_batch_01.csv,5
+aka2026ulxhxz,2026-10-15T23:30:20.010Z,62.79,-148.391,51.9,2.9,"72 km SSE of Cantwell, Alaska",automatic,earthquake,usgs_batch_01.csv,6
+nn00925810,2026-10-15T22:55:34.180Z,38.9351,-115.2815,5.4126,3.41,"19 km W of Preston, Nevada",reviewed,earthquake,usgs_batch_01.csv,7
+us6000u2le,2026-10-15T21:29:07.770Z,13.8226,-91.9535,35.809,4.4,"52 km S of Champerico, Guatemala",reviewed,earthquake,usgs_batch_01.csv,8
+pr71536828,2026-10-15T21:12:28.970Z,18.975833333333,-67.944833333333,10.42,3.44,"65 km NE of Punta Cana, Dominican Republic",reviewed,earthquake,usgs_batch_01.csv,9
+us6000u2kz,2026-10-15T20:39:25.755Z,13.9013,-91.8178,59.487,4.5,"44 km SSE of Champerico, Guatemala",reviewed,earthquake,usgs_batch_01.csv,10
+us6000u2kw,2026-10-15T20:25:20.509Z,-20.0692,-69.6992,72.177,4.3,"11 km SE of Huara, Chile",reviewed,earthquake,usgs_batch_01.csv,11
+aka2026ulqgjv,2026-10-15T19:58:37.884Z,57.083,-156.198,0.1,2.9,"86 km SE of Ugashik, Alaska",automatic,earthquake,usgs_batch_01.csv,12
+aka2026ulpwbm,2026-10-15T19:46:42.353Z,66.673,-146.894,5,3.6,"41 km NNE of Beaver, Alaska",reviewed,earthquake,usgs_batch_01.csv,13
+aka2026ulpmpu,2026-10-15T19:35:47.176Z,60.018,-152.84,111.7,2.7,"62 km W of Happy Valley, Alaska",automatic,earthquake,usgs_batch_01.csv,14
+nc75449961,2026-10-15T17:57:32.790Z,36.988166809082,-121.46050262451,5.1300001144409,2.54,"10 km ESE of Gilroy, CA",automatic,earthquake,usgs_batch_01.csv,15
+aka2026ulmeki,2026-10-15T17:56:32.715Z,60.273,-151.023,54.5,2.5,"15 km ESE of Kasilof, Alaska",automatic,earthquake,usgs_batch_01.csv,16
+nc75449946,2026-10-15T17:25:32.550Z,40.337001800537,-124.43499755859,19.620000839233,2.95,"13 km W of Petrolia, CA",automatic,earthquake,usgs_batch_01.csv,17
+aka2026ulkzip,2026-10-15T17:20:31.535Z,64.174,-151.284,14,2.8,"59 km ENE of Lake Minchumina, Alaska",automatic,earthquake,usgs_batch_01.csv,18
+us6000u2k0,2026-10-15T17:18:54.565Z,39.053,-98.7352,8.647,2.7,"7 km SSW of Luray, Kansas",reviewed,earthquake,usgs_batch_01.csv,19
+us6000u2im,2026-10-15T16:32:51.608Z,-25.1841,-179.7319,522.752,4.4,south of the Fiji Islands,reviewed,earthquake,usgs_batch_01.csv,20
+us6000u2i9,2026-10-15T15:40:38.840Z,10.3031,-86.049,22.782,4.5,"22 km W of Tamarindo, Costa Rica",reviewed,earthquake,usgs_batch_01.csv,21
+us6000u2i2,2026-10-15T14:59:52.905Z,51.3801,159.8474,10,4.9,"198 km SSE of Vilyuchinsk, Russia",reviewed,earthquake,usgs_batch_01.csv,22
+ci41347847,2026-10-15T14:09:56.550Z,32.367666666667,-115.40766666667,15.34,2.72,"20 km W of Delta, B.C., MX",reviewed,earthquake,usgs_batch_01.csv,23
+aka2026ulejvq,2026-10-15T14:02:45.435Z,64.16,-148,107.8,3,"56 km ENE of Ferry, Alaska",automatic,earthquake,usgs_batch_01.csv,24
+us6000u2ht,2026-10-15T13:31:37.166Z,7.4452,-80.0893,10,4.5,"9 km SSE of Los Asientos, Panama",reviewed,earthquake,usgs_batch_01.csv,25
+us6000u2hv,2026-10-15T13:29:31.862Z,-15.0429,-173.4439,10,5.2,"107 km NNE of Hihifo, Tonga",reviewed,earthquake,usgs_batch_01.csv,26
+us6000u2hr,2026-10-15T13:16:26.373Z,52.0024,-169.576,10,4.7,"114 km SSW of Nikolski, Alaska",reviewed,earthquake,usgs_batch_01.csv,27
+us6000u2hp,2026-10-15T13:06:51.678Z,-13.8878,166.0921,10,5.2,"157 km W of Sola, Vanuatu",reviewed,earthquake,usgs_batch_01.csv,28
+aka2026ulcmta,2026-10-15T13:05:45.094Z,64.194,-152.746,8.2,3,"40 km NNW of Lake Minchumina, Alaska",automatic,earthquake,usgs_batch_01.csv,29
+aka2026ulaxcs,2026-10-15T12:18:08.149Z,58.84,-153.199,58.9,2.6,"88 km N of Aleneva, Alaska",automatic,earthquake,usgs_batch_01.csv,30
+nn00925803,2026-10-15T11:48:52.547Z,39.5954,-116.9398,2.0675,2.45,"15 km NE of Austin, Nevada",reviewed,earthquake,usgs_batch_01.csv,31
+us6000u2gd,2026-10-15T11:16:43.490Z,0.7509,-85.429,10,4.8,off the coast of Ecuador,reviewed,earthquake,usgs_batch_01.csv,32
+aka2026ukynnb,2026-10-15T11:07:01.800Z,64.22,-152.746,4.5,5.6,"43 km NNW of Lake Minchumina, Alaska",reviewed,earthquake,usgs_batch_01.csv,33
+nc75449796,2026-10-15T10:37:57.870Z,40.416500091553,-125.14949798584,10.659999847412,3.16,"74 km W of Petrolia, CA",automatic,earthquake,usgs_batch_01.csv,34
+nn00925799,2026-10-15T09:34:05.055Z,39.3368,-119.015,8.649,2.75,"20 km ESE of Silver Springs, Nevada",reviewed,earthquake,usgs_batch_01.csv,35
+aka2026ukttxq,2026-10-15T08:44:32.859Z,59.707,-153.098,109.8,2.8,"57 km E of Pedro Bay, Alaska",automatic,earthquake,usgs_batch_01.csv,36
+pr71536793,2026-10-15T06:53:33.360Z,17.962166666667,-66.884333333333,15.74,2.66,"1 km SSE of Maria Antonia, Puerto Rico",reviewed,earthquake,usgs_batch_01.csv,37
+aka2026ukpsgx,2026-10-15T06:42:40.871Z,64.195,-151.218,1,2.9,"63 km ENE of Lake Minchumina, Alaska",automatic,earthquake,usgs_batch_01.csv,38
+aka2026ukphfq,2026-10-15T06:30:26.017Z,55.263,-159.17,20,2.8,"72 km S of Perryville, Alaska",reviewed,earthquake,usgs_batch_01.csv,39
+nc75449686,2026-10-15T06:06:33.510Z,38.814666748047,-122.81749725342,2.5099999904633,3.05,"7 km NW of The Geysers, CA",automatic,earthquake,usgs_batch_01.csv,40
+us6000u2ev,2026-10-15T05:25:31.942Z,-38.5478,175.3814,286.008,5.3,"43 km SSE of Otorohanga, New Zealand",reviewed,earthquake,usgs_batch_01.csv,41
+pr71536783,2026-10-15T04:33:00.800Z,17.8225,-65.719166666667,5.48,2.98,"26 km SE of Emajagua, Puerto Rico",reviewed,earthquake,usgs_batch_01.csv,42
+aka2026ukkezk,2026-10-15T03:57:25.574Z,63.017,-151.036,126,2.5,"59 km NNW of Petersville, Alaska",automatic,earthquake,usgs_batch_01.csv,43
+us6000u2ec,2026-10-15T03:36:29.038Z,-13.409,-172.0686,13.211,5.1,"36 km E of Safotu, Samoa",reviewed,earthquake,usgs_batch_01.csv,44
+us6000u2eh,2026-10-15T03:36:08.430Z,-13.4327,-172.1174,13.468,4.8,"30 km E of Safotu, Samoa",reviewed,earthquake,usgs_batch_01.csv,45
+ci41347743,2026-10-15T03:30:57.500Z,33.807833333333,-116.9645,13.56,2.77,"3 km NNW of San Jacinto, CA",reviewed,earthquake,usgs_batch_01.csv,46
+us6000u2dw,2026-10-15T02:05:28.202Z,36.4152,141.7775,36.062,4.4,"100 km ESE of Takahagi, Japan",reviewed,earthquake,usgs_batch_01.csv,47
+uw714120202,2026-10-15T01:09:22.690Z,47.4165,-121.82683333333,19.43,2.64,"5 km SW of Wilderness Rim, Washington",reviewed,earthquake,usgs_batch_01.csv,48
+pr71536748,2026-10-14T23:24:41.550Z,18.663666666667,-66.282,73.78,3.1,"22 km NNE of Brenas, Puerto Rico",reviewed,earthquake,usgs_batch_01.csv,49
+us6000u2d6,2026-10-14T23:20:59.714Z,54.0004,158.1848,183.497,4.5,"82 km SSW of Mil’kovo, Russia",reviewed,earthquake,usgs_batch_01.csv,50
+us6000u2cz,2026-10-14T23:02:06.731Z,60.4649,-139.8152,5,3.1,"102 km N of Yakutat, Alaska",reviewed,earthquake,usgs_batch_01.csv,51
+us6000u2cy,2026-10-14T22:55:19.298Z,32.3282,-104.4459,9.465,3.6,"18 km NNW of Whites City, New Mexico",reviewed,earthquake,usgs_batch_01.csv,52
+us6000u2c6,2026-10-14T20:34:46.590Z,-0.3599,-80.2447,49.57,4.1,"33 km NE of Bahía de Caráquez, Ecuador",reviewed,earthquake,usgs_batch_01.csv,53
+pr71536713,2026-10-14T20:10:09.470Z,18.8555,-67.487833333333,15.52,3.14,"57 km NW of San Antonio, Puerto Rico",reviewed,earthquake,usgs_batch_01.csv,54
+nn00925751,2026-10-14T19:54:40.223Z,38.7308,-118.6531,10.1811,3.04,"12 km NE of Walker Lake, Nevada",reviewed,earthquake,usgs_batch_01.csv,55
+pr71536693,2026-10-14T18:02:18.980Z,18.927166666667,-66.808166666667,35.61,3.1,"48 km N of Hatillo, Puerto Rico",reviewed,earthquake,usgs_batch_01.csv,56
+aka2026ujmjdz,2026-10-14T16:02:44.832Z,59.945,-152.983,111.1,2.6,"65 km ENE of Pedro Bay, Alaska",automatic,earthquake,usgs_batch_01.csv,57
+us6000u2ab,2026-10-14T15:12:40.526Z,-4.6878,101.6053,10,4.3,"122 km SW of Bengkulu, Indonesia",reviewed,earthquake,usgs_batch_01.csv,58
+us6000u2a6,2026-10-14T14:42:04.428Z,-29.151,-70.9776,48.371,4.2,"67 km SSW of Vallenar, Chile",reviewed,earthquake,usgs_batch_01.csv,59
+us6000u2gk,2026-10-14T14:17:21.408Z,-0.343,-19.2064,10,4.7,central Mid-Atlantic Ridge,reviewed,earthquake,usgs_batch_01.csv,60
+nc75449266,2026-10-14T13:56:12.400Z,40.676998138428,-123.88933563232,4.4400000572205,2.99,"23 km NE of Hydesville, CA",automatic,earthquake,usgs_batch_01.csv,61
+nm60628596,2026-10-14T13:31:12.510Z,36.759,-91.557,1.49,2.45,"4 km SSW of Thomasville, Missouri",reviewed,earthquake,usgs_batch_02.csv,2
+us6000u2a0,2026-10-14T13:19:07.599Z,38.6954,141.9302,56.594,4.4,"45 km SSE of Ōfunato, Japan",reviewed,earthquake,usgs_batch_02.csv,3
+aka2026ujeyit,2026-10-14T12:20:10.324Z,52.151,-174.306,195.4,3.5,"8 km SW of Atka, Alaska",reviewed,earthquake,usgs_batch_02.csv,4
+aka2026ujebcw,2026-10-14T11:53:26.013Z,61.878,-147.425,16.8,2.9,"14 km ENE of Glacier View, Alaska",automatic,earthquake,usgs_batch_02.csv,5
+us6000u292,2026-10-14T11:27:00.438Z,36.8994,-104.8335,5,2.6,"25 km S of Weston, Colorado",reviewed,earthquake,usgs_batch_02.csv,6
+us6000u2ah,2026-10-14T11:20:54.323Z,51.503,176.9027,7.962,3.9,"294 km ESE of Attu Station, Alaska",reviewed,earthquake,usgs_batch_02.csv,7
+us6000u28y,2026-10-14T10:49:47.588Z,-20.9899,-178.7711,585.07,5.9,Fiji region,reviewed,earthquake,usgs_batch_02.csv,8
+pr71536683,2026-10-14T09:57:06.030Z,18.875333333333,-64.296,76.09,3.23,"79 km NE of Cruz Bay, U.S. Virgin Islands",reviewed,earthquake,usgs_batch_02.csv,9
+us6000u28m,2026-10-14T09:56:16.664Z,65.2872,-162.8796,10,2.6,"71 km NNE of White Mountain, Alaska",reviewed,earthquake,usgs_batch_02.csv,10
+us6000u28e,2026-10-14T09:16:18.828Z,-5.4767,35.0428,10,4.6,"42 km NNE of Kilimatinde, Tanzania",reviewed,earthquake,usgs_batch_02.csv,11
+us6000u28d,2026-10-14T09:00:27.870Z,32.3496,-104.4747,8.189,3.1,"21 km NNW of Whites City, New Mexico",reviewed,earthquake,usgs_batch_02.csv,12
+uw714119552,2026-10-14T09:00:04.270Z,47.422166666667,-121.825,19.08,2.65,"5 km WSW of Wilderness Rim, Washington",reviewed,earthquake,usgs_batch_02.csv,13
+pr71536668,2026-10-14T08:10:16.300Z,18.181166666667,-67.247666666667,19.21,2.84,"11 km W of Mayagüez, Puerto Rico",reviewed,earthquake,usgs_batch_02.csv,14
+us6000u27u,2026-10-14T06:27:06.453Z,-5.443,152.2617,35,4.9,"121 km S of Kokopo, Papua New Guinea",reviewed,earthquake,usgs_batch_02.csv,15
+us6000u27j,2026-10-14T05:09:35.397Z,7.5657,-80.6021,10,4.7,"10 km S of La Mesa, Panama",reviewed,earthquake,usgs_batch_02.csv,16
+us6000u27i,2026-10-14T04:50:59.720Z,54.9935,-160.4145,49.214,3.4,"38 km S of Sand Point, Alaska",reviewed,earthquake,usgs_batch_02.csv,17
+aka2026uioapb,2026-10-14T03:53:48.898Z,60.996,-151.068,65.6,3.2,"8 km SSE of Tyonek, Alaska",automatic,earthquake,usgs_batch_02.csv,18
+us6000u272,2026-10-14T03:11:09.258Z,-20.3552,-70.2699,44.914,4.9,"16 km WSW of La Tirana, Chile",reviewed,earthquake,usgs_batch_02.csv,19
+us6000u273,2026-10-14T03:02:14.593Z,5.0056,-27.5843,10,4.8,North Atlantic Ocean,reviewed,earthquake,usgs_batch_02.csv,20
+us6000u271,2026-10-14T02:59:27.574Z,-5.4957,152.3942,10,4.7,"128 km S of Kokopo, Papua New Guinea",reviewed,earthquake,usgs_batch_02.csv,21
+us6000u26u,2026-10-14T02:12:14.885Z,-4.4488,152.9436,10,4.6,"75 km E of Kokopo, Papua New Guinea",reviewed,earthquake,usgs_batch_02.csv,22
+us6000u26f,2026-10-14T00:36:45.416Z,-29.219,-71.9168,10,5,"98 km NW of Coquimbo, Chile",reviewed,earthquake,usgs_batch_02.csv,23
+us6000u26c,2026-10-14T00:30:47.706Z,-29.2155,-71.8024,21.947,5.1,"93 km NNW of Coquimbo, Chile",reviewed,earthquake,usgs_batch_02.csv,24
+ci41347255,2026-10-13T23:59:55.930Z,33.365166666667,-116.4115,11.31,2.46,"13 km NNW of Borrego Springs, CA",reviewed,earthquake,usgs_batch_02.csv,25
+tx2026ueznej,2026-10-13T23:54:43.577Z,31.722,-104.3,6.6638,2.6,"50 km S of Whites City, New Mexico",reviewed,earthquake,usgs_batch_02.csv,26
+pr71536653,2026-10-13T23:29:55.680Z,18.562666666667,-67.003,21.72,2.83,"7 km NNE of Isabela, Puerto Rico",reviewed,earthquake,usgs_batch_02.csv,27
+us6000u265,2026-10-13T23:26:52.460Z,-21.8365,-68.7527,124.331,4.4,"70 km NNE of Calama, Chile",reviewed,earthquake,usgs_batch_02.csv,28
+us6000u25y,2026-10-13T22:39:00.232Z,32.3762,-104.478,10,3.6,"23 km WSW of Carlsbad, New Mexico",reviewed,earthquake,usgs_batch_02.csv,29
+us6000u25i,2026-10-13T21:24:21.135Z,6.7888,-73.0065,162.209,4.8,"5 km NW of Cepitá, Colombia",reviewed,earthquake,usgs_batch_02.csv,30
+hv75055482,2026-10-13T19:27:58.120Z,19.310166666667,-155.00016666667,34.29,2.72,"19 km SSW of Leilani Estates, Hawaii",reviewed,earthquake,usgs_batch_02.csv,31
+us6000u24c,2026-10-13T18:45:03.231Z,-5.4832,152.1364,20.842,6,"126 km S of Kokopo, Papua New Guinea",reviewed,earthquake,usgs_batch_02.csv,32
+us6000u24a,2026-10-13T18:36:38.928Z,1.6816,-76.3106,10,4.4,"20 km WSW of Palestina, Colombia",reviewed,earthquake,usgs_batch_02.csv,33
+nc75448936,2026-10-13T18:28:09.450Z,35.779666900635,-121.46183013916,-0.31999999284744,2.57,"28 km SSE of Lopez Point, CA",automatic,earthquake,usgs_batch_02.csv,34
+us6000u23d,2026-10-13T16:28:15.172Z,-5.4453,152.1025,36.991,5.1,"123 km S of Kokopo, Papua New Guinea",reviewed,earthquake,usgs_batch_02.csv,35
+pr2026286000,2026-10-13T15:55:16.640Z,18.4615,-68.8911,117,3.87,"9 km ENE of La Romana, Dominican Republic",reviewed,earthquake,usgs_batch_02.csv,36
+us6000u21y,2026-10-13T15:21:44.242Z,5.3478,125.5183,65.699,4.8,"8 km SE of Sarangani, Philippines",reviewed,earthquake,usgs_batch_02.csv,37
+us6000u21s,2026-10-13T14:36:12.242Z,-5.5103,152.1283,29.792,5.3,"129 km S of Kokopo, Papua New Guinea",reviewed,earthquake,usgs_batch_02.csv,38
+aka2026uhnbig,2026-10-13T14:24:13.863Z,60.663,-150.985,55.5,2.5,"15 km NNE of Ridgeway, Alaska",automatic,earthquake,usgs_batch_02.csv,39
+ci41347047,2026-10-13T13:55:45.280Z,36.025166666667,-117.78083333333,1.72,2.71,"15 km NE of Little Lake, CA",reviewed,earthquake,usgs_batch_02.csv,40
+us6000u21d,2026-10-13T12:51:32.169Z,7.7902,-81.6085,10,4.5,"26 km SSW of Zapotillo, Panama",reviewed,earthquake,usgs_batch_02.csv,41
+us6000u219,2026-10-13T12:38:04.963Z,-25.7094,-70.6778,32.198,4.1,"38 km SSW of Taltal, Chile",reviewed,earthquake,usgs_batch_02.csv,42
+us6000u214,2026-10-13T12:23:07.248Z,-0.4085,-19.4308,10,6.8,central Mid-Atlantic Ridge,reviewed,earthquake,usgs_batch_02.csv,43
+us6000u211,2026-10-13T12:12:46.978Z,36.5385,70.8791,188.82,4.3,"36 km S of Jurm, Afghanistan",reviewed,earthquake,usgs_batch_02.csv,44
+us6000u20z,2026-10-13T12:05:41.519Z,51.6162,159.9496,10,4.9,"180 km SE of Vilyuchinsk, Russia",reviewed,earthquake,usgs_batch_02.csv,45
+pr71536588,2026-10-13T11:41:02.180Z,19.118,-68.4885,21.94,3.37,"54 km NNE of Otra Banda, Dominican Republic",reviewed,earthquake,usgs_batch_02.csv,46
+us6000u20t,2026-10-13T11:20:04.077Z,-0.4259,-80.3128,38.884,4.4,"22 km NNE of Bahía de Caráquez, Ecuador",reviewed,earthquake,usgs_batch_02.csv,47
+pr71536583,2026-10-13T10:41:08.310Z,18.534833333333,-66.975166666667,16.8,2.72,"6 km NE of Isabela, Puerto Rico",reviewed,earthquake,usgs_batch_02.csv,48
+nc75448751,2026-10-13T10:15:48.040Z,40.286998748779,-124.50350189209,9.4300003051758,2.66,"19 km WSW of Petrolia, CA",automatic,earthquake,usgs_batch_02.csv,49
+nc75448746,2026-10-13T10:06:58.730Z,40.470832824707,-124.88416290283,18.280000686646,2.47,"53 km WNW of Petrolia, CA",automatic,earthquake,usgs_batch_02.csv,50
+us6000u20i,2026-10-13T09:48:28.205Z,-9.9266,118.8246,35,4.5,"71 km SW of Tambolaka, Indonesia",reviewed,earthquake,usgs_batch_02.csv,51
+us6000u20g,2026-10-13T09:41:12.899Z,38.5166,68.8922,10,4.7,"9 km NE of Boshkengash, Tajikistan",reviewed,earthquake,usgs_batch_02.csv,52
+us6000u207,2026-10-13T08:38:28.325Z,-28.556,-12.5205,10,5.3,southern Mid-Atlantic Ridge,reviewed,earthquake,usgs_batch_02.csv,53
+aka2026uhbeyn,2026-10-13T08:28:51.577Z,62.296,-151.351,98.9,3,"34 km N of Skwentna, Alaska",automatic,earthquake,usgs_batch_02.csv,54
+us6000u200,2026-10-13T08:15:04.080Z,38.8294,104.9421,10,4.6,"63 km W of Bayan Hot, China",reviewed,earthquake,usgs_batch_02.csv,55
+aka2026ugxyux,2026-10-13T06:51:32.555Z,56.827,-155.658,1.2,2.8,"91 km W of Akhiok, Alaska",automatic,earthquake,usgs_batch_02.csv,56
+us6000u1zh,2026-10-13T06:39:04.944Z,7.7685,-81.4531,10,4.7,"14 km WNW of Río Grande, Panama",reviewed,earthquake,usgs_batch_02.csv,57
+pr71536573,2026-10-13T06:05:45.670Z,18.542,-66.631333333333,13.49,2.86,"10 km N of Animas, Puerto Rico",reviewed,earthquake,usgs_batch_02.csv,58
+us6000u1zc,2026-10-13T06:01:24.155Z,19.6853,120.7047,10,4.7,"124 km N of Pagudpud, Philippines",reviewed,earthquake,usgs_batch_02.csv,59
+us6000u1z5,2026-10-13T05:44:46.919Z,0.1685,-19.8598,10,6.7,central Mid-Atlantic Ridge,reviewed,earthquake,usgs_batch_02.csv,60
+us6000u1yx,2026-10-13T05:28:18.605Z,7.4834,-79.9181,10,4.4,"13 km ESE of Pedasí, Panama",reviewed,earthquake,usgs_batch_02.csv,61
+aka2026uguozn,2026-10-13T05:10:29.153Z,60.389,-152.228,86.4,2.5,"48 km NW of Ninilchik, Alaska",automatic,earthquake,usgs_batch_03.csv,2
+us6000u1yg,2026-10-13T04:15:19.677Z,7.6156,-81.0054,10,4.3,"11 km SSW of Tebario, Panama",reviewed,earthquake,usgs_batch_03.csv,3
+us6000u1ye,2026-10-13T04:00:15.768Z,-9.4473,113.8887,10,5.1,"119 km SSW of Gambiran Satu, Indonesia",reviewed,earthquake,usgs_batch_03.csv,4
+us6000u1y6,2026-10-13T03:04:11.094Z,-28.8882,-67.2536,128.266,4.4,"38 km NE of Chilecito, Argentina",reviewed,earthquake,usgs_batch_03.csv,5
+us6000u1y4,2026-10-13T02:48:02.033Z,7.582,-80.5888,10,4.7,"9 km SSE of La Mesa, Panama",reviewed,earthquake,usgs_batch_03.csv,6
+aka2026ugowli,2026-10-13T02:18:54.572Z,51.224,177.87,6.6,2.8,"Rat Islands, Aleutian Islands, Alaska",reviewed,earthquake,usgs_batch_03.csv,7
+us6000u1xy,2026-10-13T02:16:57.992Z,-58.1423,-26.2058,139.58,4.5,South Sandwich Islands region,reviewed,earthquake,usgs_batch_03.csv,8
+us6000u1xk,2026-10-13T01:44:23.964Z,-36.1819,-73.4058,25.568,4,"62 km NW of Tomé, Chile",reviewed,earthquake,usgs_batch_03.csv,9
+hv75055022,2026-10-13T01:09:08.590Z,19.361166666667,-155.08033333333,6.06,3.13,"12 km SSE of Fern Forest, Hawaii",reviewed,earthquake,usgs_batch_03.csv,10
+us6000u1x7,2026-10-13T00:35:58.172Z,45.3536,143.4423,277.064,4.1,"81 km NE of Esashi, Japan",reviewed,earthquake,usgs_batch_03.csv,11
+us6000u1x2,2026-10-13T00:02:01.476Z,7.7956,-81.5285,10,4.6,"23 km WNW of Río Grande, Panama",reviewed,earthquake,usgs_batch_03.csv,12
+us6000u1zs,2026-10-12T23:47:24.658Z,-5.7318,102.2066,10,4.4,"213 km S of Bengkulu, Indonesia",reviewed,earthquake,usgs_batch_03.csv,13
+us6000u1wz,2026-10-12T23:45:13.532Z,7.8267,-81.6339,10,4.5,"24 km SW of Zapotillo, Panama",reviewed,earthquake,usgs_batch_03.csv,14
+us6000u1x0,2026-10-12T23:43:52.181Z,-6.3101,130.3681,130.231,4.1,"274 km WSW of Tual, Indonesia",reviewed,earthquake,usgs_batch_03.csv,15
+us6000u1ww,2026-10-12T23:36:46.150Z,7.7328,-81.4934,10,4.9,"17 km W of Río Grande, Panama",reviewed,earthquake,usgs_batch_03.csv,16
+aka2026ugjlay,2026-10-12T23:35:48.306Z,62.385,-151.309,84,2.5,"30 km WSW of Petersville, Alaska",automatic,earthquake,usgs_batch_03.csv,17
+aka2026ugizxy,2026-10-12T23:23:01.755Z,55.194,-157.064,6,3.5,"148 km SE of Chignik, Alaska",reviewed,earthquake,usgs_batch_03.csv,18
+us6000u1wn,2026-10-12T23:20:36.003Z,7.6896,-81.4896,11,6.1,"17 km W of Río Grande, Panama",reviewed,earthquake,usgs_batch_03.csv,19
+us6000u1z2,2026-10-12T22:26:21.879Z,51.0989,178.3765,26.909,3.4,"Rat Islands, Aleutian Islands, Alaska",reviewed,earthquake,usgs_batch_03.csv,20
+us6000u1w7,2026-10-12T21:48:54.521Z,7.9416,-81.4309,10,4.5,"5 km WSW of Calidonia, Panama",reviewed,earthquake,usgs_batch_03.csv,21
+us6000u1w6,2026-10-12T21:43:30.326Z,7.8015,-81.5113,10,4.5,"21 km WNW of Río Grande, Panama",reviewed,earthquake,usgs_batch_03.csv,22
+us6000u1vf,2026-10-12T20:05:25.236Z,7.7181,-81.5677,10,4.8,"25 km W of Río Grande, Panama",reviewed,earthquake,usgs_batch_03.csv,23
+us6000u1us,2026-10-12T18:34:01.393Z,40.6928,-127.0627,10,2.8,"237 km W of Ferndale, California",reviewed,earthquake,usgs_batch_03.csv,24
+us6000u1uv,2026-10-12T18:30:19.138Z,-16.5382,67,10,4.6,Mid-Indian Ridge,reviewed,earthquake,usgs_batch_03.csv,25
+us6000u1ut,2026-10-12T18:27:41.875Z,-16.294,67.1096,10,4.7,Mid-Indian Ridge,reviewed,earthquake,usgs_batch_03.csv,26
+us6000u1uq,2026-10-12T18:17:18.852Z,-33.721,-71.8113,33.627,4.8,"23 km SW of San Antonio, Chile",reviewed,earthquake,usgs_batch_03.csv,27
+aka2026ufxqfk,2026-10-12T17:42:00.997Z,55.41,-154.611,26.6,2.5,"173 km S of Akhiok, Alaska",automatic,earthquake,usgs_batch_03.csv,28
+us6000u1uk,2026-10-12T17:25:53.427Z,39.61,142.5791,35,4.4,"54 km E of Miyako, Japan",reviewed,earthquake,usgs_batch_03.csv,29
+aka2026ufwwcc,2026-10-12T17:17:55.056Z,53.573,-160.081,11.9,2.8,"198 km S of Sand Point, Alaska",reviewed,earthquake,usgs_batch_03.csv,30
+aka2026ufwuay,2026-10-12T17:16:24.260Z,57.12,-156.779,102.1,2.5,"57 km SE of Ugashik, Alaska",automatic,earthquake,usgs_batch_03.csv,31
+us6000u1sx,2026-10-12T16:12:25.209Z,-8.795,122.8849,98.413,4.2,"76 km ESE of Maumere, Indonesia",reviewed,earthquake,usgs_batch_03.csv,32
+aka2026ufubsq,2026-10-12T15:55:18.476Z,51.003,178.437,17.3,3.1,"Rat Islands, Aleutian Islands, Alaska",reviewed,earthquake,usgs_batch_03.csv,33
+us6000u1sn,2026-10-12T15:44:33.749Z,48.2626,154.8502,35,4.9,"283 km SSW of Severo-Kuril’sk, Russia",reviewed,earthquake,usgs_batch_03.csv,34
+us6000u1sk,2026-10-12T15:37:21.474Z,10.1601,93.0837,91.329,4.6,"170 km SSE of Port Blair, India",reviewed,earthquake,usgs_batch_03.csv,35
+pr71536538,2026-10-12T15:36:33.960Z,19.110166666667,-68.9915,19.9,3.35,"15 km NNE of Miches, Dominican Republic",reviewed,earthquake,usgs_batch_03.csv,36
+aka2026uftgts,2026-10-12T15:31:05.339Z,55.388,-159.317,16.7,2.5,"58 km S of Ivanof Bay, Alaska",reviewed,earthquake,usgs_batch_03.csv,37
+nc75448351,2026-10-12T15:21:56.130Z,40.289001464844,-124.62483215332,0.73000001907349,3.43,"29 km W of Petrolia, CA",automatic,earthquake,usgs_batch_03.csv,38
+us6000u1s8,2026-10-12T14:29:53.312Z,51.4264,174.8342,10,4.6,"194 km SE of Attu Station, Alaska",reviewed,earthquake,usgs_batch_03.csv,39
+aka2026ufqvwj,2026-10-12T14:19:11.278Z,60.356,-152.852,132.6,2.7,"73 km WNW of Ninilchik, Alaska",reviewed,earthquake,usgs_batch_03.csv,40
+us6000u1s2,2026-10-12T13:44:41.942Z,-16.2931,67.099,10,4.8,Mid-Indian Ridge,reviewed,earthquake,usgs_batch_03.csv,41
+us6000u1rx,2026-10-12T13:17:18.746Z,7.3997,-80.4946,10,4.5,"6 km W of Tonosí, Panama",reviewed,earthquake,usgs_batch_03.csv,42
+us6000u1rv,2026-10-12T13:05:41.141Z,54.4548,-159.9069,35,3.5,"105 km SSE of Sand Point, Alaska",reviewed,earthquake,usgs_batch_03.csv,43
+aka2026ufnapa,2026-10-12T12:24:04.470Z,65.736,-145.484,4.3,2.6,"36 km WNW of Central, Alaska",reviewed,earthquake,usgs_batch_03.csv,44
+nn00925658,2026-10-12T12:13:31.321Z,40.7726,-119.3977,3.4832,2.58,"13 km NNW of Gerlach, Nevada",reviewed,earthquake,usgs_batch_03.csv,45
+nc75448271,2026-10-12T12:13:16.850Z,40.269832611084,-124.58333587647,5.0100002288818,2.53,"26 km WSW of Petrolia, CA",automatic,earthquake,usgs_batch_03.csv,46
+us6000u1rm,2026-10-12T11:58:08.604Z,-9.152,113.0997,55.223,4.6,"100 km SSW of Kencong, Indonesia",reviewed,earthquake,usgs_batch_03.csv,47
+nc75448261,2026-10-12T11:45:41.870Z,40.29033279419,-124.65633392334,0.28000000119209,3.41,"32 km W of Petrolia, CA",automatic,earthquake,usgs_batch_03.csv,48
+us6000u1rh,2026-10-12T11:28:43.398Z,-8.873,67.3909,10,5.4,Mid-Indian Ridge,reviewed,earthquake,usgs_batch_03.csv,49
+us6000u1re,2026-10-12T11:07:27.400Z,7.4832,-80.646,10,4.3,"6 km NNW of El Cortezo, Panama",reviewed,earthquake,usgs_batch_03.csv,50
+aka2026ufjkww,2026-10-12T10:36:03.147Z,51.05,178.197,13.3,3.2,"Rat Islands, Aleutian Islands, Alaska",reviewed,earthquake,usgs_batch_03.csv,51
+us6000u1r8,2026-10-12T10:29:00.890Z,-33.7025,-70.2587,107.176,4.3,"31 km ESE of Puente Alto, Chile",reviewed,earthquake,usgs_batch_03.csv,52
+aka2026ufivvp,2026-10-12T10:18:41.004Z,52.764,-169.908,12.4,2.6,"73 km WSW of Nikolski, Alaska",reviewed,earthquake,usgs_batch_03.csv,53
+nc75448246,2026-10-12T09:12:55.060Z,40.28150177002,-124.59049987793,7.1199998855591,2.72,"26 km W of Petrolia, CA",automatic,earthquake,usgs_batch_03.csv,54
+us6000u1r3,2026-10-12T08:59:14.629Z,0.6834,125.9293,49.217,4.6,"122 km SE of Bitung, Indonesia",reviewed,earthquake,usgs_batch_03.csv,55
+us6000u1qy,2026-10-12T08:30:08.695Z,-8.237,128.9661,22.434,4.7,"219 km E of Lospalos, Timor Leste",reviewed,earthquake,usgs_batch_03.csv,56
+tx2026ubyylo,2026-10-12T08:24:13.261Z,31.664,-104.421,5.8948,2.5,"56 km S of Whites City, New Mexico",reviewed,earthquake,usgs_batch_03.csv,57
+aka2026ufdbwh,2026-10-12T07:25:43.969Z,55.395,-159.001,33.4,2.5,"58 km S of Perryville, Alaska",reviewed,earthquake,usgs_batch_03.csv,58
+us6000u1qd,2026-10-12T07:16:06.367Z,7.6987,-80.9143,10,4.5,"7 km ESE of Tebario, Panama",reviewed,earthquake,usgs_batch_03.csv,59
+us6000u1qb,2026-10-12T07:08:08.682Z,-1.7692,-78.2036,164.281,4.1,"27 km WSW of Palora, Ecuador",reviewed,earthquake,usgs_batch_03.csv,60
+aka2026ufchhi,2026-10-12T07:01:58.636Z,51.57,-175.374,27.3,2.9,"93 km ESE of Adak, Alaska",reviewed,earthquake,usgs_batch_03.csv,61
