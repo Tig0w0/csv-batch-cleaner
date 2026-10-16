@@ -15,6 +15,7 @@ Manually opening multiple spreadsheet exports, copying rows, checking missing fi
 | Feature | Status |
 |---|---|
 | Drag-and-drop CSV/XLSX files or folders | Supported |
+| Auto-detect columns; choose duplicate/required/numeric fields without typing | Supported |
 | Batch import CSV and .xlsx | Supported |
 | Mixed CSV/XLSX input folder | Supported |
 | First worksheet of each .xlsx | Supported |
@@ -59,12 +60,12 @@ On Windows, double-click `run_demo.bat` or run:
 python gui.py
 ```
 
-1. **Drop** one or more CSV/XLSX files, folders, or a mixture onto the drop zone. Alternatively, select an input folder using **Browse**.
-2. Choose a separate results folder.
-3. Set the unique key (default: `id`), required columns, and numeric columns to match the input data.
-4. Click **Run Data Cleanup**, then **Open HTML report**.
+1. **Drop** one or more CSV/XLSX files or folders onto the drop zone, or select a folder using **Browse**.
+2. Confirm the **Find duplicates by** dropdown (usually an ID or record number).
+3. Click **Choose columns** beside **Must-have values** and **Check numeric values** to select the validation rules with checkboxes.
+4. Choose a separate output folder, click **Run Data Cleanup**, then **Open HTML report**.
 
-The desktop app opens with the included USGS sample folder and its validation fields prefilled. When you drop new files, those sample-specific validation defaults switch to generic `id` validation; **confirm the unique key and validation fields for your files**. Any custom rules already entered remain in place. Dropped folders contribute supported files directly inside the folder (not recursively); duplicates from overlapping selections are ignored. Drops never upload or copy your source files. The CLI retains generic defaults: unique key `id`, required `id`, and no numeric validation.
+The desktop app preloads the sample data and automatically detects column names shared by the selected files. New input selections default to `id` (or the first shared column if `id` is absent), require that column, and leave numeric checks optional. **Always confirm the duplicate key and validation choices:** they depend on what each file represents. Only common columns can be selected because configured validation columns must exist in every file. Dropped folders are scanned one level deep, and duplicate file selections are ignored. The original input files stay untouched and offline. The CLI retains generic defaults: key `id`, required `id`, and no numeric validation.
 
 ### CLI
 
@@ -149,8 +150,6 @@ data/example_output/  committed USGS sample outputs
 assets/               real screenshots of the GUI and report
 ```
 
-## Source, license and attribution
+## License and sample data
 
-Sources: **U.S. Geological Survey** earthquake observations, **NOAA/NCEI** daily station observations, and **U.S. Census Bureau** population estimates. See [DATA_SOURCES.md](DATA_SOURCES.md) and [TEST_CASES.md](TEST_CASES.md) for exact source URLs, dataset scope, reuse context and synthetic modifications.
-
-Code is MIT-licensed; that license does **not** relicense the source datasets. This independent portfolio project is not affiliated with or endorsed by any of the agencies.
+**Code:** [MIT](LICENSE). **Sample data:** USGS, NOAA and the U.S. Census Bureau; demonstration errors were synthetically generated. This project is not affiliated with those agencies. See [DATA_SOURCES.md](DATA_SOURCES.md) and [TEST_CASES.md](TEST_CASES.md) for original source links and reuse details; the MIT license applies only to our code.

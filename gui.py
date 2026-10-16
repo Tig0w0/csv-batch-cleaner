@@ -1,116 +1,214 @@
-"""Tiny offline desktop interface. No account, uploads, or server required."""
+"""Small offline CSV/Excel desktop UI. One processing engine, no cloud."""
 from pathlib import Path
+from queue import Empty, Queue
+import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import webbrowser
-import threading
-from queue import Empty, Queue
 
 from tkinterdnd2 import DND_FILES, TkinterDnD
-from cleaner import DEFAULT_KEY, DEFAULT_REQUIRED, DEFAULT_NUMERIC, process
+
+from cleaner import DEFAULT_KEY, normalize_header, process
+from spreadsheet_io import read_header
 
 ROOT = Path(__file__).resolve().parent
+SAMPLE_REQUIRED = "id,time,latitude,longitude"
+SAMPLE_NUMERIC = "latitude,longitude,depth,magnitude"
 
 
 class Window(TkinterDnD.Tk):
     def __init__(self):
         super().__init__()
         self.title("CSV & Excel Cleaner | Local Automation")
-        self.geometry("760x700")
-        self.minsize(660, 650)
+        self.geometry("760x730")
+        self.minsize(660, 690)
         self.configure(bg="#f2f6fa")
         self.input_var = tk.StringVar(value=str(ROOT / "data" / "input"))
         self.output_var = tk.StringVar(value=str(ROOT / "data" / "output"))
         self.key_var = tk.StringVar(value=DEFAULT_KEY)
-        self.required_var = tk.StringVar(value="id,time,latitude,longitude")
-        self.numeric_var = tk.StringVar(value="latitude,longitude,depth,magnitude")
+        self.required_var = tk.StringVar(value=SAMPLE_REQUIRED)
+        self.numeric_var = tk.StringVar(value=SAMPLE_NUMERIC)
+        self.required_preview = tk.StringVar()
+        self.numeric_preview = tk.StringVar()
+        self.columns = []
         self.events = Queue()
         self.report_path = None
         self.dropped = None
         self.input_var.trace_add("write", lambda *_: setattr(self, "dropped", None))
         self._build()
+        self._load_columns(keep_sample=True)
 
     def _build(self):
         style = ttk.Style(self)
         style.theme_use("clam")
         style.configure("TEntry", padding=9, relief="flat", borderwidth=1)
         style.configure("TButton", padding=9, font=("Segoe UI", 10))
-        outer = tk.Frame(self, bg="#f2f6fa", padx=34, pady=19)
+        outer = tk.Frame(self, bg="#f2f6fa", padx=34, pady=18)
         outer.pack(fill="both", expand=True)
         header = tk.Frame(outer, bg="#14283b", padx=25, pady=17)
-        header.pack(fill="x", pady=(0, 20))
+        header.pack(fill="x", pady=(0, 17))
         tk.Label(header, text="LOCAL WORKFLOW AUTOMATION", bg="#14283b", fg="#78d6d9",
                  font=("Segoe UI", 10, "bold")).pack(anchor="w")
         tk.Label(header, text="CSV & Excel Cleaner", bg="#14283b", fg="white",
                  font=("Segoe UI", 23, "bold")).pack(anchor="w", pady=(3, 2))
         tk.Label(header, text="Merge · Validate · Deduplicate · Export report",
                  bg="#14283b", fg="#b9ceda", font=("Segoe UI", 10)).pack(anchor="w")
+
         form = tk.Frame(outer, bg="#f2f6fa")
         form.pack(fill="x")
-        self._folder(form, "INPUT FOLDER", self.input_var, 0)
+        self._folder(form, "INPUT FILE / FOLDER", self.input_var, 0)
         self._folder(form, "OUTPUT FOLDER", self.output_var, 1)
         drop = tk.Label(form, text="Drop CSV / XLSX files or folders here",
                         bg="#e8f5f5", fg="#176472", font=("Segoe UI", 11, "bold"),
-                        relief="groove", bd=1, pady=9)
+                        relief="groove", bd=1, pady=10)
         drop.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(0, 12))
         drop.drop_target_register(DND_FILES)
         drop.dnd_bind("<<Drop>>", self._drop)
+
         options = tk.Frame(form, bg="#f2f6fa")
-        options.grid(row=3, column=0, columnspan=2, sticky="ew", pady=(2, 8))
+        options.grid(row=3, column=0, columnspan=2, sticky="ew", pady=(0, 7))
         options.grid_columnconfigure(1, weight=1)
-        for index, (title, variable) in enumerate([
-            ("Unique key", self.key_var),
-            ("Required columns", self.required_var),
-            ("Numeric columns", self.numeric_var),
-        ]):
-            tk.Label(options, text=title, bg="#f2f6fa", fg="#37485a",
-                     font=("Segoe UI", 10)).grid(row=index, column=0, sticky="w", pady=5, padx=(0, 18))
-            ttk.Entry(options, textvariable=variable).grid(row=index, column=1, sticky="ew", pady=5)
+        for row, caption in enumerate(("Find duplicates by", "Must-have values", "Check numeric values")):
+            tk.Label(options, text=caption, bg="#f2f6fa", fg="#37485a",
+                     font=("Segoe UI", 10)).grid(row=row, column=0, sticky="w", pady=6, padx=(0, 16))
+        self.key_combo = ttk.Combobox(options, textvariable=self.key_var, state="readonly")
+        self.key_combo.grid(row=0, column=1, sticky="ew", pady=6)
+        for row, var, name in ((1, self.required_preview, "required"),
+                               (2, self.numeric_preview, "numeric")):
+            line = tk.Frame(options, bg="#f2f6fa")
+            line.grid(row=row, column=1, sticky="ew", pady=4)
+            ttk.Button(line, text="Choose columns", command=lambda kind=name: self._pick(kind)).pack(side="left")
+            tk.Label(line, textvariable=var, bg="#f2f6fa", fg="#526b7b",
+                     font=("Segoe UI", 9), anchor="w").pack(side="left", padx=10)
+
         actions = tk.Frame(outer, bg="#f2f6fa")
-        actions.pack(fill="x", pady=(4, 9))
-        self.run_btn = tk.Button(actions, text="RUN DATA CLEANUP  →", bg="#047d89", fg="white",
+        actions.pack(fill="x", pady=(5, 9))
+        self.run_btn = tk.Button(actions, text="RUN DATA CLEANUP →", bg="#047d89", fg="white",
                                  relief="flat", cursor="hand2", font=("Segoe UI", 11, "bold"),
                                  padx=24, pady=12, command=self._run)
         self.run_btn.pack(side="left")
-        self.report_btn = ttk.Button(actions, text="Open HTML report", command=self._report, state="disabled")
+        self.report_btn = ttk.Button(actions, text="Open HTML report",
+                                     command=self._report, state="disabled")
         self.report_btn.pack(side="left", padx=12)
-        self.status = tk.StringVar(value="Sample files are preloaded. Edit the columns for your own data.")
+        self.status = tk.StringVar(value="Select the columns to check, then run.")
         tk.Label(outer, textvariable=self.status, bg="#f2f6fa", fg="#526b7b",
                  wraplength=650, justify="left", font=("Segoe UI", 10)).pack(anchor="w")
-        tk.Label(outer, text="100% offline · Python + openpyxl · No paid APIs",
+        tk.Label(outer, text="100% offline · No uploads or paid APIs",
                  bg="#f2f6fa", fg="#708596", font=("Segoe UI", 9)).pack(side="bottom", anchor="w")
 
     def _folder(self, parent, title, variable, row):
         frame = tk.Frame(parent, bg="#f2f6fa")
-        frame.grid(row=row, column=0, columnspan=2, sticky="ew", pady=(0, 12))
+        frame.grid(row=row, column=0, columnspan=2, sticky="ew", pady=(0, 10))
         parent.grid_columnconfigure(0, weight=1)
         frame.grid_columnconfigure(0, weight=1)
         tk.Label(frame, text=title, bg="#f2f6fa", fg="#37485a",
                  font=("Segoe UI", 9, "bold")).grid(row=0, column=0, sticky="w")
-        ttk.Entry(frame, textvariable=variable).grid(row=1, column=0, sticky="ew", pady=(5, 0))
-        ttk.Button(frame, text="Browse", command=lambda: variable.set(
-            filedialog.askdirectory(initialdir=variable.get()) or variable.get()
-        )).grid(row=1, column=1, padx=(8, 0), pady=(5, 0))
+        entry = ttk.Entry(frame, textvariable=variable)
+        entry.grid(row=1, column=0, sticky="ew", pady=(5, 0))
+        if variable is self.input_var:
+            entry.bind("<Return>", lambda _: self._load_columns())
+            entry.bind("<FocusOut>", lambda _: self._load_columns())
+        ttk.Button(frame, text="Browse", command=lambda: self._browse(variable)).grid(
+            row=1, column=1, padx=(8, 0), pady=(5, 0))
+
+    def _browse(self, variable):
+        folder = filedialog.askdirectory(initialdir=variable.get() if Path(variable.get()).is_dir() else str(ROOT))
+        if folder:
+            variable.set(folder)
+            if variable is self.input_var:
+                self._load_columns()
 
     def _drop(self, event):
-        paths = [Path(p) for p in self.tk.splitlist(event.data)]
+        paths = [Path(value) for value in self.tk.splitlist(event.data)]
         if not paths or any(not p.exists() or
                             (p.is_file() and p.suffix.lower() not in (".csv", ".xlsx"))
                             for p in paths):
             messagebox.showerror("Unsupported drop", "Drop existing CSV/XLSX files or folders.")
             return
-        if len(paths) == 1 and paths[0].is_dir():
-            self.input_var.set(str(paths[0]))
-        else:
-            self.input_var.set(f"{len(paths)} dropped item(s)")
-            self.dropped = [str(p) for p in paths]
-        if (self.required_var.get() == "id,time,latitude,longitude" and
-                self.numeric_var.get() == "latitude,longitude,depth,magnitude"):
-            self.required_var.set(DEFAULT_REQUIRED)
-            self.numeric_var.set(DEFAULT_NUMERIC)
-        self.status.set(f"Selected {len(paths)} item(s). Check the key and validation fields, then run.")
+        self.input_var.set(str(paths[0]) if len(paths) == 1 else f"{len(paths)} dropped items")
+        self.dropped = [str(p) for p in paths] if len(paths) > 1 else None
+        self._load_columns()
+
+    def _load_columns(self, keep_sample=False):
+        """Show only fields shared by every selected file, matching core validation."""
+        source = self.dropped or [self.input_var.get()]
+        try:
+            files = sorted({f.resolve() for item in source for p in [Path(item)]
+                            for f in (p.iterdir() if p.is_dir() else [p])
+                            if f.is_file() and f.suffix.lower() in (".csv", ".xlsx")
+                            and not f.name.startswith("~$")})
+            if not files:
+                raise ValueError("No CSV/XLSX files found. Choose an input folder or drop files.")
+            headers = [[normalize_header(value) for value in read_header(file)] for file in files]
+            self.columns = [col for col in headers[0] if col and all(col in fields for fields in headers[1:])]
+            if not self.columns:
+                raise ValueError("Selected files have no column names in common.")
+            self.key_combo["values"] = self.columns
+            self.key_var.set(DEFAULT_KEY if DEFAULT_KEY in self.columns else self.columns[0])
+            self.required_var.set(
+                ",".join(c for c in SAMPLE_REQUIRED.split(",") if c in self.columns)
+                if keep_sample else self.key_var.get())
+            self.numeric_var.set(
+                ",".join(c for c in SAMPLE_NUMERIC.split(",") if c in self.columns)
+                if keep_sample else "")
+            self._refresh_previews()
+            self.run_btn.configure(state="normal")
+            self.status.set(f"Found {len(self.columns)} shared columns across {len(files)} file(s).")
+        except (OSError, ValueError, UnicodeError) as exc:
+            self.columns = []
+            self.key_combo["values"] = ()
+            self.run_btn.configure(state="disabled")
+            self.status.set(f"Input: {exc}")
+
+    def _refresh_previews(self):
+        for var, preview in ((self.required_var, self.required_preview),
+                             (self.numeric_var, self.numeric_preview)):
+            fields = var.get().split(",") if var.get() else []
+            preview.set(", ".join(fields[:2]) + (f" +{len(fields)-2}" if len(fields) > 2 else "")
+                        if fields else "None selected")
+
+    def _pick(self, kind):
+        if not self.columns:
+            messagebox.showinfo("Choose input", "Drop a file or select a folder first.")
+            return
+        variable = self.required_var if kind == "required" else self.numeric_var
+        selected = set(variable.get().split(",")) if variable.get() else set()
+        dialog = tk.Toplevel(self)
+        dialog.title("Required values" if kind == "required" else "Validate as numbers")
+        dialog.geometry("400x440")
+        dialog.transient(self)
+        dialog.grab_set()
+        tk.Label(dialog, text="Check the columns to validate", font=("Segoe UI", 11, "bold"),
+                 pady=12).pack()
+        content = ttk.Frame(dialog)
+        content.pack(fill="both", expand=True, padx=15)
+        canvas = tk.Canvas(content, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(content, orient="vertical", command=canvas.yview)
+        checks = ttk.Frame(canvas)
+        window = canvas.create_window((0, 0), window=checks, anchor="nw")
+        checks.bind("<Configure>", lambda _: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.bind("<Configure>", lambda e: canvas.itemconfigure(window, width=e.width))
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        flags = [(col, tk.BooleanVar(value=col in selected)) for col in self.columns]
+        for name, checked in flags:
+            ttk.Checkbutton(checks, text=name, variable=checked).pack(anchor="w", pady=3)
+
+        def apply():
+            variable.set(",".join(name for name, flag in flags if flag.get()))
+            self._refresh_previews()
+            dialog.destroy()
+
+        buttons = ttk.Frame(dialog)
+        buttons.pack(pady=12)
+        ttk.Button(buttons, text="Apply", command=apply).pack(side="left", padx=5)
+        ttk.Button(buttons, text="Cancel", command=dialog.destroy).pack(side="left", padx=5)
 
     def _run(self):
+        if not self.columns:
+            messagebox.showerror("Choose input", "Select CSV/XLSX files first.")
+            return
         self.report_path = None
         self.report_btn.configure(state="disabled")
         self.run_btn.configure(state="disabled")
