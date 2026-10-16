@@ -14,9 +14,10 @@ def main() -> int:
     parser.add_argument("--key", default=DEFAULT_KEY, help="Unique record key (default: id)")
     parser.add_argument("--required", default=DEFAULT_REQUIRED, help="Comma-separated required columns")
     parser.add_argument("--numeric", default=DEFAULT_NUMERIC, help="Comma-separated numeric columns")
+    parser.add_argument("--usgs-demo", action="store_true", help="Map USGS-specific headers")
     args = parser.parse_args()
     try:
-        result = process(args.input, args.output, args.key, args.required, args.numeric)
+        result = process(args.input, args.output, args.key, args.required, args.numeric, args.usgs_demo)
     except (OSError, ValueError, UnicodeError, RuntimeError, csv.Error) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2

@@ -41,7 +41,7 @@ class CleaningTests(unittest.TestCase):
             ["", "2026-10-04", "20.1", "4.2"],
             ["EQ4", "2026-10-05", "55.0", "5.0"],
         ])
-        result = process(self.src, self.out, "id", "id,time,latitude", "latitude,magnitude")
+        result = process(self.src, self.out, "id", "id,time,latitude", "latitude,magnitude", usgs_demo=True)
         self.assertEqual((result.processed_rows, result.clean_rows,
                           result.duplicate_rows, result.rejected_rows), (6, 3, 1, 2))
         self.assertEqual(result.issues["duplicate_id"], 1)
@@ -96,13 +96,13 @@ class CleaningTests(unittest.TestCase):
         self.assertEqual(row[2], 12.5)
 
     def test_normalize_header(self):
-        self.assertEqual(normalize_header(" Latitude Deg "), "latitude")
-        self.assertEqual(normalize_header("Event ID"), "id")
+        self.assertEqual(normalize_header(" Latitude Deg ", demo=True), "latitude")
+        self.assertEqual(normalize_header("Event ID", demo=True), "id")
 
     def test_duplicate_headers_not_silent(self):
         write_csv(self.src / "a.csv", [["ID", "event_id"], ["one", "two"]])
         with self.assertRaisesRegex(ValueError, "duplicate"):
-            process(self.src, self.out)
+            process(self.src, self.out, usgs_demo=True)
 
     def test_strict_unclosed_csv_quote(self):
         (self.src / "broken.csv").write_text('id,description\nONE,"hello\nTWO,world\n', encoding="utf-8")
@@ -126,7 +126,7 @@ class CleaningTests(unittest.TestCase):
         ws.append(["B", "2026", 32.4])
         ws.append(["A", "2026", 15.5])
         wb.save(self.src / "b.xlsx")
-        result = process(self.src, self.out, numeric="latitude")
+        result = process(self.src, self.out, numeric="latitude", usgs_demo=True)
         self.assertEqual((result.input_files, result.clean_rows, result.duplicate_rows), (2, 2, 1))
         workbook = load_workbook(output_file(result, "cleaned.xlsx"), read_only=True)
         try:
@@ -197,6 +197,107 @@ class CleaningTests(unittest.TestCase):
         result = process(self.src, self.out)
         self.assertEqual((result.clean_rows, result.rejected_rows), (1, 2))
         self.assertEqual(result.issues["malformed_csv_row"], 2)
+
+    def test_business_location_header_not_renamed(self):
+        write_csv(self.src / "customers.csv", [["id", "location"], ["A", "Seattle"]])
+        result = process(self.src, self.out)
+        self.assertIn("location", result.columns)
+        self.assertNotIn("place", result.columns)
+
+    def test_unicode_headers_preserved(self):
+        write_csv(self.src / "clients.csv", [["id", "고객명", "Café Name"], ["A", "Kim", "North"]])
+        result = process(self.src, self.out)
+        self.assertEqual(result.columns, ["id", "고객명", "café_name"])
+
+    def test_excel_zero_padded_identifiers(self):
+        from openpyxl import Workbook
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.append(["id", "customer"])
+        sheet.append([123, "Alice"])
+        sheet["A2"].number_format = "000000"
+        workbook.save(self.src / "ids.xlsx")
+        result = process(self.src, self.out)
+        with output_file(result, "cleaned.csv").open(encoding="utf-8-sig", newline="") as f:
+            self.assertEqual(next(csv.DictReader(f))["id"], "000123")
+
+    def test_excel_large_numeric_text_preserved(self):
+        from openpyxl import load_workbook
+        big = "12345678901234567890"
+        write_csv(self.src / "large.csv", [["id", "amount"], ["A", big]])
+        result = process(self.src, self.out, numeric="amount")
+        book = load_workbook(output_file(result, "cleaned.xlsx"), read_only=True)
+        try:
+            self.assertEqual(list(book.active.values)[1][1], big)
+        finally:
+            book.close()
+
+    def test_numeric_plus_sign_exports_consistently(self):
+        from openpyxl import load_workbook
+        write_csv(self.src / "numbers.csv", [["id", "amount"], ["A", "+125"]])
+        result = process(self.src, self.out, numeric="amount")
+        with output_file(result, "cleaned.csv").open(encoding="utf-8-sig", newline="") as f:
+            self.assertEqual(next(csv.DictReader(f))["amount"], "125")
+        book = load_workbook(output_file(result, "cleaned.xlsx"), read_only=True)
+        try:
+            self.assertEqual(list(book.active.values)[1][1], 125)
+        finally:
+            book.close()
+
+    def test_excel_lock_file_ignored(self):
+        write_csv(self.src / "orders.csv", [["id"], ["A"]])
+        (self.src / "~$active.xlsx").write_bytes(b"lock placeholder")
+        result = process(self.src, self.out)
+        self.assertEqual(result.input_files, 1)
+
+    def test_excel_format_only_extra_columns_ignored(self):
+        from openpyxl import Workbook
+        book = Workbook()
+        sheet = book.active
+        sheet.append(["id", "name"])
+        sheet.append(["A", "Alice"])
+        sheet["J8"].number_format = "0.00"
+        book.save(self.src / "styled.xlsx")
+        result = process(self.src, self.out)
+        self.assertEqual((result.clean_rows, result.rejected_rows), (1, 0))
+
+    def test_excel_error_cell_rejected(self):
+        from openpyxl import Workbook
+        book = Workbook()
+        sheet = book.active
+        sheet.append(["id", "total"])
+        sheet.append(["A", "#DIV/0!"])
+        sheet["B2"].data_type = "e"
+        book.save(self.src / "broken.xlsx")
+        result = process(self.src, self.out)
+        self.assertEqual((result.clean_rows, result.rejected_rows), (0, 1))
+        self.assertEqual(result.issues["excel_error_cell"], 1)
+
+    def test_ragged_csv_extra_values_preserved(self):
+        write_csv(self.src / "ragged.csv", [["id", "name"], ["A", "Alice", "EXTRA"]])
+        result = process(self.src, self.out)
+        with output_file(result, "rejected.csv").open(encoding="utf-8-sig", newline="") as f:
+            row = next(csv.DictReader(f))
+        self.assertEqual(row["__extra_values"], '["EXTRA"]')
+
+    def test_ragged_excel_extra_values_preserved(self):
+        from openpyxl import Workbook
+        book = Workbook()
+        sheet = book.active
+        sheet.append(["id", "name"])
+        sheet.append(["A", "Alice", "EXTRA"])
+        book.save(self.src / "ragged.xlsx")
+        result = process(self.src, self.out)
+        with output_file(result, "rejected.csv").open(encoding="utf-8-sig", newline="") as f:
+            row = next(csv.DictReader(f))
+        self.assertEqual(row["__extra_values"], '["EXTRA"]')
+
+    def test_example_summary_uses_relative_output_path(self):
+        write_csv(self.src / "one.csv", [["id"], ["A"]])
+        result = process(self.src, self.out)
+        import json
+        summary = json.loads(output_file(result, "summary.json").read_text(encoding="utf-8"))
+        self.assertEqual(summary["output_directory"], ".")
 
 
 if __name__ == "__main__":

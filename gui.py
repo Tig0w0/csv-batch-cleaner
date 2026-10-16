@@ -24,6 +24,7 @@ class Window(tk.Tk):
         self.key_var = tk.StringVar(value=DEFAULT_KEY)
         self.required_var = tk.StringVar(value=DEFAULT_REQUIRED)
         self.numeric_var = tk.StringVar(value=DEFAULT_NUMERIC)
+        self.demo_var = tk.BooleanVar(value=False)
         self.events = Queue()
         self.report_path = None
         self._build()
@@ -66,7 +67,8 @@ class Window(tk.Tk):
         self.run_btn.pack(side="left")
         self.report_btn = ttk.Button(actions, text="Open HTML report", command=self._report, state="disabled")
         self.report_btn.pack(side="left", padx=12)
-        ttk.Button(actions, text="Use USGS demo rules", command=self._demo).pack(side="left")
+        ttk.Checkbutton(actions, text="USGS demo", variable=self.demo_var,
+                        command=self._demo).pack(side="left")
         self.status = tk.StringVar(value="Ready. Your files remain on this computer.")
         tk.Label(outer, textvariable=self.status, bg="#f2f6fa", fg="#526b7b",
                  wraplength=650, justify="left", font=("Segoe UI", 10)).pack(anchor="w")
@@ -87,9 +89,10 @@ class Window(tk.Tk):
 
     def _demo(self):
         self.key_var.set(DEFAULT_KEY)
-        self.required_var.set(DEMO_REQUIRED)
-        self.numeric_var.set(DEMO_NUMERIC)
-        self.status.set("USGS demo checks loaded. Choose Run Data Cleanup.")
+        self.required_var.set(DEMO_REQUIRED if self.demo_var.get() else DEFAULT_REQUIRED)
+        self.numeric_var.set(DEMO_NUMERIC if self.demo_var.get() else DEFAULT_NUMERIC)
+        self.status.set("USGS demo mapping enabled." if self.demo_var.get()
+                        else "Generic validation enabled.")
 
     def _run(self):
         self.report_path = None
@@ -97,7 +100,8 @@ class Window(tk.Tk):
         self.run_btn.configure(state="disabled")
         self.status.set("Processing input files...")
         inputs = (self.input_var.get(), self.output_var.get(),
-                  self.key_var.get(), self.required_var.get(), self.numeric_var.get())
+                  self.key_var.get(), self.required_var.get(), self.numeric_var.get(),
+                  self.demo_var.get())
 
         def worker():
             try:

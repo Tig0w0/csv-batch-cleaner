@@ -24,7 +24,7 @@ DEMO_REQUIRED = "id,time,latitude,longitude"
 DEMO_NUMERIC = "latitude,longitude,depth,magnitude"
 
 # Explicit demonstration aliases. Other datasets can supply matching headers.
-ALIASES = {
+DEMO_ALIASES = {
     "event_id": "id",
     "eventid": "id",
     "latitude_deg": "latitude",
@@ -35,18 +35,19 @@ ALIASES = {
     "location": "place",
 }
 TRACE = ("__source_file", "__source_row")
+RESERVED = (*TRACE, "__issue", "__extra_values")
 MAX_BYTES = 20 * 1024 * 1024  # per input file
 MAX_TOTAL_BYTES = 100 * 1024 * 1024
 MAX_COLUMNS = 200
 
 
-def normalize_header(value: str) -> str:
-    name = re.sub(r"[^a-z0-9]+", "_", value.strip().lower()).strip("_")
-    return ALIASES.get(name, name)
+def normalize_header(value: str, demo: bool = False) -> str:
+    name = re.sub(r"[^\w]+", "_", value.strip().casefold()).strip("_")
+    return DEMO_ALIASES.get(name, name) if demo else name
 
 
-def split_columns(value: str) -> list[str]:
-    return list(dict.fromkeys(normalize_header(x) for x in value.split(",") if x.strip()))
+def split_columns(value: str, demo: bool = False) -> list[str]:
+    return list(dict.fromkeys(normalize_header(x, demo) for x in value.split(",") if x.strip()))
 
 
 def escape_csv_formula(value: str) -> str:
@@ -77,17 +78,28 @@ class Results:
     output_directory: str
 
 
-def _write_csv(path: Path, fields: list[str], rows: list[dict[str, str]]) -> None:
+def _write_csv(path: Path, fields: list[str], rows: list[dict[str, str]],
+               numeric: set[str]) -> None:
     with path.open("w", encoding="utf-8-sig", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
-            writer.writerow({field: escape_csv_formula(str(row.get(field, ""))) for field in fields})
+            cells = {}
+            for field in fields:
+                value = str(row.get(field, ""))
+                # A leading plus sign in a verified number is not a CSV formula.
+                if field in numeric and value.startswith("+"):
+                    try:
+                        value = value[1:] if math.isfinite(float(value)) else value
+                    except ValueError:
+                        pass
+                cells[field] = escape_csv_formula(value)
+            writer.writerow(cells)
 
 
 def process(input_dir: str | Path, output_dir: str | Path,
             key: str = DEFAULT_KEY, required: str = DEFAULT_REQUIRED,
-            numeric: str = DEFAULT_NUMERIC) -> Results:
+            numeric: str = DEFAULT_NUMERIC, usgs_demo: bool = False) -> Results:
     source, target = Path(input_dir).resolve(), Path(output_dir).resolve()
     if not source.is_dir():
         raise ValueError("Input directory does not exist.")
@@ -95,17 +107,17 @@ def process(input_dir: str | Path, output_dir: str | Path,
         raise ValueError("Input and output folders must be separate, non-nested directories.")
 
     files = sorted(p for p in source.iterdir() if p.is_file()
-                   and p.suffix.lower() in (".csv", ".xlsx"))
+                   and p.suffix.lower() in (".csv", ".xlsx") and not p.name.startswith("~$"))
     if not files:
         raise ValueError("No CSV/XLSX files found in the input directory.")
     total_bytes = 0
-    key = normalize_header(key)
-    if not key or key in TRACE:
+    key = normalize_header(key, usgs_demo)
+    if not key or key in RESERVED:
         raise ValueError("Invalid deduplication key.")
-    required_cols = list(dict.fromkeys([key, *split_columns(required)]))
-    numeric_cols = split_columns(numeric)
+    required_cols = list(dict.fromkeys([key, *split_columns(required, usgs_demo)]))
+    numeric_cols = split_columns(numeric, usgs_demo)
     for column in [*required_cols, *numeric_cols]:
-        if column in TRACE or not column:
+        if column in RESERVED or not column:
             raise ValueError("Invalid validation column.")
 
     normalized_headers: dict[Path, list[str]] = {}
@@ -118,10 +130,10 @@ def process(input_dir: str | Path, output_dir: str | Path,
         total_bytes += size
         if size > MAX_BYTES or total_bytes > MAX_TOTAL_BYTES:
             raise ValueError("Input too large (20 MB/file, 100 MB total).")
-        fields = [normalize_header(value) for value in read_header(file)]
+        fields = [normalize_header(value, usgs_demo) for value in read_header(file)]
         if not fields or not all(fields) or len(fields) != len(set(fields)):
             raise ValueError(f"{file.name}: empty or duplicate header names.")
-        if len(fields) > MAX_COLUMNS or any(field in TRACE or field == "__issue" for field in fields):
+        if len(fields) > MAX_COLUMNS or any(field in RESERVED for field in fields):
             raise ValueError(f"{file.name}: too many or reserved column names.")
         missing = checked_cols - set(fields)
         if missing:
@@ -140,12 +152,13 @@ def process(input_dir: str | Path, output_dir: str | Path,
     processed = 0
     for file in files:
         headers = normalized_headers[file]
-        for rowno, cells, malformed in read_records(file, len(headers)):
+        for rowno, cells, reasons in read_records(file, len(headers)):
             processed += 1
-            record = dict(zip(headers, cells))
+            record = dict(zip(headers, cells[:len(headers)]))
             record["__source_file"] = file.name
             record["__source_row"] = str(rowno)
-            reasons: list[str] = ["malformed_csv_row"] if malformed else []
+            if len(cells) > len(headers) and any(cells[len(headers):]):
+                record["__extra_values"] = json.dumps(cells[len(headers):], ensure_ascii=False)
             for column in required_cols:
                 if not record.get(column, ""):
                     reasons.append(f"missing_{column}")
@@ -189,13 +202,13 @@ def process(input_dir: str | Path, output_dir: str | Path,
         for basename, rows, exported_fields in (
             ("cleaned", kept, fields),
             ("duplicates", duplicates, [*fields, "__issue"]),
-            ("rejected", rejected, [*fields, "__issue"]),
+            ("rejected", rejected, [*fields, "__extra_values", "__issue"]),
         ):
-            _write_csv(staging / f"{basename}.csv", exported_fields, rows)
+            _write_csv(staging / f"{basename}.csv", exported_fields, rows, set(numeric_cols))
             write_xlsx(staging / f"{basename}.xlsx", exported_fields, rows,
                        set(numeric_cols), escape_csv_formula)
         (staging / "summary.json").write_text(
-            json.dumps(asdict(summary), indent=2, ensure_ascii=False) + "\n",
+            json.dumps({**asdict(summary), "output_directory": "."}, indent=2, ensure_ascii=False) + "\n",
             encoding="utf-8"
         )
         (staging / "report.html").write_text(build_report(summary, files), encoding="utf-8")
