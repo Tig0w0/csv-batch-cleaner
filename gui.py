@@ -38,11 +38,8 @@ class Window(TkinterDnD.Tk):
         self.export_flags = {name: tk.BooleanVar(value=name == "cleaned.xlsx")
                              for name in EXPORT_NAMES}
         self.last_result = None
-        self.last_exports = set()
-        self.last_prefix = ""
         self.columns = []
         self.events = Queue()
-        self.report_path = None
         self.dropped = None
         self.input_var.trace_add("write", lambda *_: setattr(self, "dropped", None))
         self._build()
@@ -61,7 +58,7 @@ class Window(TkinterDnD.Tk):
                  font=("Segoe UI", 10, "bold")).pack(anchor="w")
         tk.Label(header, text="CSV & Excel Cleaner", bg="#14283b", fg="white",
                  font=("Segoe UI", 23, "bold")).pack(anchor="w", pady=(3, 2))
-        tk.Label(header, text="Merge · Validate · Deduplicate · Export report",
+        tk.Label(header, text="Merge · Validate · Deduplicate · Export files",
                  bg="#14283b", fg="#b9ceda", font=("Segoe UI", 10)).pack(anchor="w")
 
         form = tk.Frame(outer, bg="#f2f6fa")
@@ -108,10 +105,8 @@ class Window(TkinterDnD.Tk):
                     row=row, column=col, sticky="w", padx=8)
         extras = ttk.Frame(export_panel)
         extras.grid(row=4, column=0, columnspan=3, sticky="w", pady=(5, 4))
-        for name, title in (("report.html", "Save HTML report"),
-                            ("summary.json", "Save JSON summary")):
-            ttk.Checkbutton(extras, text=title, variable=self.export_flags[name]).pack(
-                side="left", padx=(7, 18))
+        ttk.Checkbutton(extras, text="Save JSON summary",
+                        variable=self.export_flags["summary.json"]).pack(side="left", padx=7)
         tk.Label(export_panel, text="Filename prefix (optional)", bg="#f2f6fa",
                  font=("Segoe UI", 10)).grid(row=5, column=0, sticky="w", padx=8)
         ttk.Entry(export_panel, textvariable=self.filename_prefix).grid(
@@ -253,14 +248,11 @@ class Window(TkinterDnD.Tk):
         if not exports:
             messagebox.showerror("Select output", "Choose at least one output file.")
             return
-        self.report_path = None
         self.last_result = None
         self.report_btn.configure(state="disabled")
         self.run_btn.configure(state="disabled")
         self.status.set("Processing input files...")
-        self.last_exports = exports
-        self.last_prefix = self.filename_prefix.get().strip()
-        prefix = self.last_prefix
+        prefix = self.filename_prefix.get().strip()
         inputs = (self.dropped or self.input_var.get(), self.output_var.get(),
                   self.key_var.get(), self.required_var.get(), self.numeric_var.get())
 
@@ -286,9 +278,6 @@ class Window(TkinterDnD.Tk):
             messagebox.showerror("CSV Batch Cleaner", result)
             return
         self.last_result = result
-        self.report_path = (Path(result.output_directory) /
-                            export_filename("report.html", self.last_prefix)
-                            if "report.html" in self.last_exports else None)
         self.status.set(f"Complete: {result.clean_rows} clean / {result.duplicate_rows} duplicates / "
                         f"{result.rejected_rows} rejected, from {result.input_files} files. "
                         f"Results: {result.output_directory}")
@@ -335,9 +324,6 @@ class Window(TkinterDnD.Tk):
         buttons.pack(side="bottom", fill="x", pady=(18, 0))
         ttk.Button(buttons, text="Open output folder", command=lambda: webbrowser.open(
             Path(result.output_directory).as_uri())).pack(side="left")
-        if self.report_path:
-            ttk.Button(buttons, text="Open HTML", command=lambda: webbrowser.open(
-                self.report_path.as_uri())).pack(side="left", padx=8)
         ttk.Button(buttons, text="Close", command=dialog.destroy).pack(side="right")
 
 

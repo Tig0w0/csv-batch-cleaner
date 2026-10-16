@@ -1,8 +1,6 @@
 # CSV & Excel Batch Cleaner
 
-**Offline Python automation for merging CSV/XLSX exports, validating records, detecting duplicates, and generating an audit-friendly HTML report.** A small desktop GUI and CLI use the **same processing engine**.
-
-![HTML report screenshot](assets/report-preview.png)
+**Offline Python automation for merging CSV/XLSX exports, validating records, detecting duplicates, and showing results directly in the desktop app.** The GUI and CLI use the **same processing engine**.
 
 > **Portfolio demonstration, not a client project.** Three publicly released U.S. government datasets (USGS, NOAA, Census) are tested with **deliberately injected, labeled synthetic errors**. No real client data or client results are claimed.
 
@@ -24,7 +22,7 @@ Manually opening multiple spreadsheet exports, copying rows, checking missing fi
 | Case-insensitive deduplication using an ID column | Supported |
 | Source filename and original row tracking | Supported |
 | Independently select clean / duplicate / rejected results as CSV and/or XLSX | Supported |
-| In-app results dashboard; optional HTML report and JSON summary | Supported |
+| In-app results dashboard and optional JSON summary | Supported |
 | Optional filename prefix on all selected outputs | Supported |
 | Windows GUI and scriptable CLI | Supported |
 | No cloud uploads or paid APIs | Supported |
@@ -63,7 +61,7 @@ python gui.py
 
 1. **Drop** one or more CSV/XLSX files or folders, or select an input folder using **Browse**.
 2. Select the duplicate key and optional required/numeric checks from the detected columns.
-3. Under **Output files**, check only the CSV/XLSX categories you need. Optionally check **Save HTML report** and **Save JSON summary**.
+3. Under **Output files**, choose only the CSV/XLSX categories you need. **Save JSON summary** is optional.
 4. Optionally enter a filename prefix, e.g. `October` → `October_cleaned.xlsx`.
 5. Click **Run Data Cleanup**. The result counts, issue reasons and saved filenames appear **inside the app**, with a button to open the output folder.
 
@@ -81,10 +79,10 @@ Use `--exports` and `--prefix` to choose the exact CLI outputs:
 
 ```bash
 python cli.py --input data/input --output data/output \
-  --exports cleaned.xlsx,rejected.csv,report.html --prefix October
+  --exports cleaned.xlsx,rejected.csv,summary.json --prefix October
 ```
 
-The CLI defaults to all eight output files for compatibility; GUI export choices are independent.
+The CLI defaults to all seven supported files (six CSV/XLSX combinations plus JSON); GUI export choices are independent.
 
 For another business export, change the input/output directory and validation field names. **Every configured required or numeric column must exist in each source file.** Names are normalized consistently (for example, `Order ID` becomes `order_id`); the tool does not guess whether differently named columns have the same meaning.
 
@@ -117,9 +115,8 @@ Every run creates a **new subfolder** under the requested output folder, such as
 | `duplicates.csv` / `duplicates.xlsx` | Extra records sharing the same ID |
 | `rejected.csv` / `rejected.xlsx` | Invalid records with reasons and any overflow columns preserved |
 | `summary.json` | Machine-readable processing totals |
-| `report.html` | Standalone report linking only to files actually generated |
 
-Select individual combinations; nothing extra is exported. The in-app report is displayed even when HTML and JSON are not selected. Prefixes are optional and support letters, numbers, underscores and hyphens (up to 40 characters).
+Select individual combinations; nothing extra is exported. The in-app result summary appears after processing even without JSON output. Prefixes are optional and support letters, numbers, underscores and hyphens (up to 40 characters).
 
 The original input files are never modified. Results are written to a staging directory first and published as a complete run folder only after every output is created successfully.
 

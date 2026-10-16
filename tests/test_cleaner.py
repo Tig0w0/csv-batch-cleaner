@@ -46,7 +46,7 @@ class CleaningTests(unittest.TestCase):
         self.assertEqual(result.issues["duplicate_id"], 1)
         self.assertEqual(result.issues["invalid_number_latitude"], 1)
         self.assertEqual(result.issues["missing_id"], 1)
-        self.assertTrue(output_file(result, "report.html").exists())
+        self.assertTrue(output_file(result, "summary.json").exists())
         with output_file(result, "cleaned.csv").open(encoding="utf-8-sig", newline="") as fp:
             rows = list(csv.DictReader(fp))
         self.assertEqual({r["id"] for r in rows}, {"EQ1", "EQ2", "EQ4"})
@@ -337,34 +337,29 @@ class CleaningTests(unittest.TestCase):
         self.assertEqual(files, {"October_2026_cleaned.xlsx", "October_2026_rejected.csv"})
         self.assertEqual((result.clean_rows, result.duplicate_rows, result.rejected_rows), (1, 1, 1))
 
-    def test_optional_report_links_include_only_generated_names(self):
+    def test_optional_json_and_prefixed_filename(self):
         write_csv(self.src / "one.csv", [["id"], ["A"]])
         result = process(self.src, self.out,
-                         exports={"cleaned.csv", "summary.json", "report.html"},
-                         prefix="client_1")
+                         exports={"cleaned.csv", "summary.json"}, prefix="client_1")
         names = {p.name for p in Path(result.output_directory).iterdir()}
-        self.assertEqual(names, {"client_1_cleaned.csv", "client_1_summary.json", "client_1_report.html"})
-        report = output_file(result, "client_1_report.html").read_text(encoding="utf-8")
-        self.assertIn('href="client_1_cleaned.csv"', report)
-        self.assertIn('href="client_1_summary.json"', report)
-        self.assertNotIn('href="rejected.csv"', report)
-        self.assertNotIn('href="duplicates.xlsx"', report)
+        self.assertEqual(names, {"client_1_cleaned.csv", "client_1_summary.json"})
+        summary = json.loads(output_file(result, "client_1_summary.json").read_text(encoding="utf-8"))
+        self.assertEqual((summary["clean_rows"], summary["output_directory"]), (1, "."))
 
-    def test_html_report_only_does_not_create_spreadsheet_files(self):
+    def test_removed_html_output_is_rejected(self):
         write_csv(self.src / "one.csv", [["id"], ["A"]])
-        result = process(self.src, self.out, exports={"report.html"})
-        self.assertEqual([p.name for p in Path(result.output_directory).iterdir()], ["report.html"])
-        self.assertIn("No additional files selected",
-                      output_file(result, "report.html").read_text(encoding="utf-8"))
+        with self.assertRaisesRegex(ValueError, "supported output"):
+            process(self.src, self.out, exports={"report.html"})
+        self.assertFalse(self.out.exists())
 
-    def test_no_report_or_summary_is_necessary(self):
+    def test_no_json_summary_is_necessary(self):
         write_csv(self.src / "one.csv", [["id"], ["A"]])
         result = process(self.src, self.out, exports={"cleaned.csv"})
         self.assertEqual([p.name for p in Path(result.output_directory).iterdir()], ["cleaned.csv"])
 
     def test_invalid_output_selections_and_prefix_do_not_create_results(self):
         write_csv(self.src / "one.csv", [["id"], ["A"]])
-        for kwargs in ({"exports": set()}, {"exports": {"cleaned.pdf"}},
+        for kwargs in ({"exports": set()}, {"exports": {"cleaned.pdf"}}, {"exports": {"report.html"}},
                        {"prefix": "../unsafe"}, {"prefix": "a/b"}, {"prefix": "a" * 41}):
             with self.subTest(kwargs=kwargs):
                 with self.assertRaisesRegex(ValueError, "output|prefix"):

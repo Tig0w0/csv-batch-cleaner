@@ -14,7 +14,7 @@ def main() -> int:
     parser.add_argument("--key", default=DEFAULT_KEY, help="Unique record key (default: id)")
     parser.add_argument("--required", default=DEFAULT_REQUIRED, help="Comma-separated required columns")
     parser.add_argument("--numeric", default=DEFAULT_NUMERIC, help="Comma-separated numeric columns")
-    parser.add_argument("--exports", help="Comma-separated outputs, e.g. cleaned.xlsx,rejected.csv,report.html; default: all")
+    parser.add_argument("--exports", help="Comma-separated outputs, e.g. cleaned.xlsx,rejected.csv,summary.json; default: all")
     parser.add_argument("--prefix", default="", help="Optional filename prefix (letters, digits, _ or -)")
     args = parser.parse_args()
     try:

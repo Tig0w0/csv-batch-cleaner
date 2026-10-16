@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import csv
-import html
 import json
 import math
 import re
@@ -28,7 +27,7 @@ MAX_COLUMNS = 200
 EXPORT_NAMES = frozenset(
     f"{name}.{suffix}" for name in ("cleaned", "duplicates", "rejected")
     for suffix in ("csv", "xlsx")
-) | {"summary.json", "report.html"}
+) | {"summary.json"}
 
 
 def export_filename(name: str, prefix: str = "") -> str:
@@ -225,74 +224,8 @@ def process(input_dir: str | Path | list[str | Path], output_dir: str | Path,
             (staging / export_filename("summary.json", prefix)).write_text(
                 json.dumps({**asdict(summary), "output_directory": "."},
                            indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-        if "report.html" in exports:
-            (staging / export_filename("report.html", prefix)).write_text(
-                build_report(summary, files, exports, prefix), encoding="utf-8")
         staging.rename(final)
     finally:
         if staging.exists():
             shutil.rmtree(staging)
     return summary
-
-
-def build_report(s: Results, files: list[Path],
-                 exports: set[str] | None = None, prefix: str = "") -> str:
-    exports = set(EXPORT_NAMES) if exports is None else exports
-    esc = html.escape
-    pct = round(s.clean_rows * 100 / s.processed_rows, 1) if s.processed_rows else 0
-    issue_rows = "".join(
-        f"<tr><td>{esc(name.replace('_', ' ').capitalize())}</td><td>{count:,}</td></tr>"
-        for name, count in s.issues.items()
-    ) or '<tr><td colspan="2">No issues detected</td></tr>'
-    input_rows = "".join(
-        f"<tr><td>{esc(p.name)}</td><td>{p.stat().st_size:,} bytes</td></tr>"
-        for p in files
-    )
-    chips = "".join(f'<span class="chip">{esc(field)}</span>' for field in s.columns[:16])
-    downloads = "".join(
-        f'<a href="{esc(export_filename(name, prefix), quote=True)}">'
-        f'{esc(name.replace(".", " ").title())} ↗</a>'
-        for name in ("cleaned.csv", "cleaned.xlsx", "duplicates.csv", "duplicates.xlsx",
-                     "rejected.csv", "rejected.xlsx", "summary.json") if name in exports
-    ) or '<span>No additional files selected</span>'
-    return f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CSV & Excel Cleaner | Processing Report</title>
-<style>
-:root{{--ink:#142439;--muted:#63758a;--line:#e3eaf0;--bg:#f4f7fb;--accent:#047d89;--success:#188674;--warn:#e09a39;--danger:#d85d68}}
-*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);font:15px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:var(--ink)}}
-main{{max-width:1080px;margin:0 auto;padding:48px 24px 70px}}
-header{{background:#13283b;color:#fff;padding:42px;border-radius:20px;display:flex;justify-content:space-between;gap:16px;align-items:end}}
-.overline{{color:#7ddee3;letter-spacing:.14em;font-weight:800;font-size:12px}}h1{{font-size:34px;margin:10px 0 8px;line-height:1.15}}header p{{margin:0;color:#bad0dc}}
-.stamp{{font-size:12px;color:#a8c2d2;text-align:right}}.grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:22px 0}}
-.kpi{{background:#fff;border:1px solid var(--line);border-radius:15px;padding:22px}}.kpi small{{display:block;color:var(--muted);font-weight:700}}
-.kpi strong{{font-size:32px;font-weight:750;display:block;margin-top:10px;letter-spacing:-1px}}
-.kpi:nth-child(2) strong{{color:var(--success)}}.kpi:nth-child(3) strong{{color:var(--warn)}}.kpi:nth-child(4) strong{{color:var(--danger)}}
-.panel{{border:1px solid var(--line);background:white;border-radius:16px;padding:26px;margin-top:18px}}
-h2{{margin:0 0 16px;font-size:19px}}.progress{{height:14px;border-radius:40px;background:#e3eaf0;overflow:hidden;display:flex}}
-.good{{background:var(--success)}}.dupe{{background:var(--warn)}}.bad{{background:var(--danger)}}
-.legend{{display:flex;gap:24px;flex-wrap:wrap;margin:14px 0 0;color:var(--muted);font-size:13px}}
-.dot{{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}}.columns{{display:flex;gap:7px;flex-wrap:wrap}}
-.chip{{padding:5px 10px;background:#edf4f7;color:#426074;border-radius:7px;font:12px Consolas,monospace}}
-table{{width:100%;border-collapse:collapse}}td{{border-bottom:1px solid var(--line);padding:12px 6px}}td:last-child{{text-align:right;font-weight:700}}
-.downloads{{display:flex;flex-wrap:wrap;gap:10px}}.downloads a{{text-decoration:none;color:#006673;border:1px solid #b8d8da;background:#eef9f9;border-radius:9px;padding:10px 15px;font-weight:700;font-size:13px}}
-footer{{color:var(--muted);font-size:12px;margin:22px 4px}}@media(max-width:700px){{.grid{{grid-template-columns:repeat(2,1fr)}}header{{display:block}}.stamp{{text-align:left;margin-top:14px}}h1{{font-size:28px}}}}
-</style></head>
-<body><main><header><div><div class="overline">DATA QUALITY / AUTOMATION</div><h1>CSV & Excel Processing Report</h1><p>Batch merging · data validation · duplicate detection</p></div>
-<div class="stamp">CREATED IN UTC<br>{esc(s.created_utc)}</div></header>
-<div class="grid">
-<div class="kpi"><small>Processed rows</small><strong>{s.processed_rows:,}</strong></div>
-<div class="kpi"><small>Clean rows</small><strong>{s.clean_rows:,}</strong></div>
-<div class="kpi"><small>Duplicates</small><strong>{s.duplicate_rows:,}</strong></div>
-<div class="kpi"><small>Rejected rows</small><strong>{s.rejected_rows:,}</strong></div></div>
-<section class="panel"><h2>Data quality overview · {pct}% accepted</h2>
-<div class="progress"><span class="good" style="width:{s.clean_rows * 100 / max(s.processed_rows, 1):.3f}%"></span>
-<span class="dupe" style="width:{s.duplicate_rows * 100 / max(s.processed_rows, 1):.3f}%"></span>
-<span class="bad" style="width:{s.rejected_rows * 100 / max(s.processed_rows, 1):.3f}%"></span></div>
-<div class="legend"><span><i class="dot" style="background:var(--success)"></i>Accepted</span><span><i class="dot" style="background:var(--warn)"></i>Duplicates</span><span><i class="dot" style="background:var(--danger)"></i>Rejected</span></div></section>
-<section class="panel"><h2>Detected issues</h2><table>{issue_rows}</table></section>
-<section class="panel"><h2>Source files · {s.input_files}</h2><table>{input_rows}</table></section>
-<section class="panel"><h2>Normalized column names</h2><div class="columns">{chips}</div></section>
-<section class="panel"><h2>Exported deliverables</h2><div class="downloads">{downloads}</div></section>
-<footer>Created by CSV Batch Cleaner · Local processing only · No data is sent to external services.</footer>
-</main></body></html>"""
