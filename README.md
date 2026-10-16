@@ -23,8 +23,9 @@ Manually opening multiple spreadsheet exports, copying rows, checking missing fi
 | Required-field and numeric validation | Supported |
 | Case-insensitive deduplication using an ID column | Supported |
 | Source filename and original row tracking | Supported |
-| Cleaned, duplicate, and rejected CSV **and XLSX** files | Supported |
-| Standalone HTML quality report and JSON summary | Supported |
+| Independently select clean / duplicate / rejected results as CSV and/or XLSX | Supported |
+| In-app results dashboard; optional HTML report and JSON summary | Supported |
+| Optional filename prefix on all selected outputs | Supported |
 | Windows GUI and scriptable CLI | Supported |
 | No cloud uploads or paid APIs | Supported |
 | Original Excel styling, formulas, macros, pivot tables | **Not supported** |
@@ -42,7 +43,7 @@ The same processing engine was tested against **three distinct data schemas** us
 | U.S. Census population | 1 XLSX | 221 | 208 | 4 | 9 |
 | **Total** | **6 files** | **582** | **542** | **14** | **26** |
 
-**35 automated regression tests passed.** Three separate malformed-input checks also verified that no partial output is published. These tests demonstrate controlled input/output behavior, **not performance on large datasets or real client projects**. Source records and synthetic anomalies are kept separate; details and reproduction commands are in [TEST_CASES.md](TEST_CASES.md).
+**41 automated regression tests passed.** Three separate malformed-input checks also verified that no partial output is published. These tests demonstrate controlled input/output behavior, **not performance on large datasets or real client projects**. Source records and synthetic anomalies are kept separate; details and reproduction commands are in [TEST_CASES.md](TEST_CASES.md).
 
 ![Desktop GUI](assets/gui-preview.png)
 
@@ -60,12 +61,13 @@ On Windows, double-click `run_demo.bat` or run:
 python gui.py
 ```
 
-1. **Drop** one or more CSV/XLSX files or folders onto the drop zone, or select a folder using **Browse**.
-2. Confirm the **Find duplicates by** dropdown (usually an ID or record number).
-3. Click **Choose columns** beside **Must-have values** and **Check numeric values** to select the validation rules with checkboxes.
-4. Choose a separate output folder, click **Run Data Cleanup**, then **Open HTML report**.
+1. **Drop** one or more CSV/XLSX files or folders, or select an input folder using **Browse**.
+2. Select the duplicate key and optional required/numeric checks from the detected columns.
+3. Under **Output files**, check only the CSV/XLSX categories you need. Optionally check **Save HTML report** and **Save JSON summary**.
+4. Optionally enter a filename prefix, e.g. `October` → `October_cleaned.xlsx`.
+5. Click **Run Data Cleanup**. The result counts, issue reasons and saved filenames appear **inside the app**, with a button to open the output folder.
 
-The desktop app preloads the sample data and automatically detects column names shared by the selected files. New input selections default to `id` (or the first shared column if `id` is absent), require that column, and leave numeric checks optional. **Always confirm the duplicate key and validation choices:** they depend on what each file represents. Only common columns can be selected because configured validation columns must exist in every file. Dropped folders are scanned one level deep, and duplicate file selections are ignored. The original input files stay untouched and offline. The CLI retains generic defaults: key `id`, required `id`, and no numeric validation.
+The desktop app preloads the sample data and automatically detects column names shared by the selected files. **By default the GUI saves only `cleaned.xlsx`; all other exports are optional.** New input selections default to `id` (or the first shared column if `id` is absent), require that column, and leave numeric checks optional. **Always confirm the duplicate key and validation choices:** they depend on what each file represents. Only common columns can be selected because configured validation columns must exist in every file. Dropped folders are scanned one level deep, and duplicate file selections are ignored. The original input files stay untouched and offline. The CLI retains generic defaults: key `id`, required `id`, and no numeric validation.
 
 ### CLI
 
@@ -74,6 +76,15 @@ python cli.py --input data/input --output data/output --key id \
   --required id,time,latitude,longitude \
   --numeric latitude,longitude,depth,magnitude
 ```
+
+Use `--exports` and `--prefix` to choose the exact CLI outputs:
+
+```bash
+python cli.py --input data/input --output data/output \
+  --exports cleaned.xlsx,rejected.csv,report.html --prefix October
+```
+
+The CLI defaults to all eight output files for compatibility; GUI export choices are independent.
 
 For another business export, change the input/output directory and validation field names. **Every configured required or numeric column must exist in each source file.** Names are normalized consistently (for example, `Order ID` becomes `order_id`); the tool does not guess whether differently named columns have the same meaning.
 
@@ -100,13 +111,15 @@ To regenerate the optional test fixtures from the preserved snapshots, run `pyth
 
 Every run creates a **new subfolder** under the requested output folder, such as `data/output/run_20261016_120000_a1b2c3/`. Existing runs are never overwritten.
 
-| Output | Purpose |
+| Optional output | Purpose |
 |---|---|
 | `cleaned.csv` / `cleaned.xlsx` | Valid unique records |
 | `duplicates.csv` / `duplicates.xlsx` | Extra records sharing the same ID |
 | `rejected.csv` / `rejected.xlsx` | Invalid records with reasons and any overflow columns preserved |
-| `summary.json` | Processing totals and issue breakdown |
-| `report.html` | Visual summary with links to generated outputs |
+| `summary.json` | Machine-readable processing totals |
+| `report.html` | Standalone report linking only to files actually generated |
+
+Select individual combinations; nothing extra is exported. The in-app report is displayed even when HTML and JSON are not selected. Prefixes are optional and support letters, numbers, underscores and hyphens (up to 40 characters).
 
 The original input files are never modified. Results are written to a staging directory first and published as a complete run folder only after every output is created successfully.
 
@@ -140,7 +153,7 @@ cleaner.py            shared validation, deduplication and output reporting
 spreadsheet_io.py     CSV and XLSX reading / XLSX writing
 gui.py                Tkinter frontend
 cli.py                command-line frontend
-tests/                35 automated regression tests
+tests/                41 automated regression tests
 scripts/              reproducible data preparation and test runner
 data/source/          preserved original USGS feed snapshot
 data/input/           2 CSV + 1 XLSX USGS examples

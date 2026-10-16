@@ -14,9 +14,13 @@ def main() -> int:
     parser.add_argument("--key", default=DEFAULT_KEY, help="Unique record key (default: id)")
     parser.add_argument("--required", default=DEFAULT_REQUIRED, help="Comma-separated required columns")
     parser.add_argument("--numeric", default=DEFAULT_NUMERIC, help="Comma-separated numeric columns")
+    parser.add_argument("--exports", help="Comma-separated outputs, e.g. cleaned.xlsx,rejected.csv,report.html; default: all")
+    parser.add_argument("--prefix", default="", help="Optional filename prefix (letters, digits, _ or -)")
     args = parser.parse_args()
     try:
-        result = process(args.input, args.output, args.key, args.required, args.numeric)
+        result = process(args.input, args.output, args.key, args.required, args.numeric,
+                         exports=set(args.exports.split(",")) if args.exports is not None else None,
+                         prefix=args.prefix)
     except (OSError, ValueError, UnicodeError, RuntimeError, csv.Error) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2

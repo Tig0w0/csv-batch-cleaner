@@ -8,7 +8,7 @@ import webbrowser
 
 from tkinterdnd2 import DND_FILES, TkinterDnD
 
-from cleaner import DEFAULT_KEY, normalize_header, process
+from cleaner import DEFAULT_KEY, EXPORT_NAMES, export_filename, normalize_header, process
 from spreadsheet_io import read_header
 
 ROOT = Path(__file__).resolve().parent
@@ -20,8 +20,8 @@ class Window(TkinterDnD.Tk):
     def __init__(self):
         super().__init__()
         self.title("CSV & Excel Cleaner | Local Automation")
-        self.geometry("760x730")
-        self.minsize(660, 690)
+        self.geometry("790x920")
+        self.minsize(710, 800)
         self.configure(bg="#f2f6fa")
         self.input_var = tk.StringVar(value=str(ROOT / "data" / "input"))
         self.output_var = tk.StringVar(value=str(ROOT / "data" / "output"))
@@ -30,6 +30,16 @@ class Window(TkinterDnD.Tk):
         self.numeric_var = tk.StringVar(value=SAMPLE_NUMERIC)
         self.required_preview = tk.StringVar()
         self.numeric_preview = tk.StringVar()
+        self.filename_prefix = tk.StringVar()
+        self.prefix_preview = tk.StringVar(value="Example: cleaned.xlsx")
+        self.filename_prefix.trace_add(
+            "write", lambda *_: self.prefix_preview.set(
+                "Example: " + export_filename("cleaned.xlsx", self.filename_prefix.get().strip())))
+        self.export_flags = {name: tk.BooleanVar(value=name == "cleaned.xlsx")
+                             for name in EXPORT_NAMES}
+        self.last_result = None
+        self.last_exports = set()
+        self.last_prefix = ""
         self.columns = []
         self.events = Queue()
         self.report_path = None
@@ -81,14 +91,44 @@ class Window(TkinterDnD.Tk):
             tk.Label(line, textvariable=var, bg="#f2f6fa", fg="#526b7b",
                      font=("Segoe UI", 9), anchor="w").pack(side="left", padx=10)
 
+        export_panel = tk.LabelFrame(outer, text=" OUTPUT FILES (select what to save) ",
+                                     bg="#f2f6fa", fg="#37485a", padx=12, pady=7,
+                                     font=("Segoe UI", 10, "bold"))
+        export_panel.pack(fill="x", pady=(2, 8))
+        for col, title in ((0, "Data"), (1, "CSV"), (2, "Excel XLSX")):
+            tk.Label(export_panel, text=title, bg="#f2f6fa", fg="#526b7b",
+                     font=("Segoe UI", 9, "bold")).grid(row=0, column=col, sticky="w", padx=8)
+        for row, (kind, title) in enumerate((("cleaned", "Clean records"),
+                                             ("duplicates", "Duplicates"),
+                                             ("rejected", "Rejected records")), 1):
+            tk.Label(export_panel, text=title, bg="#f2f6fa",
+                     font=("Segoe UI", 10)).grid(row=row, column=0, sticky="w", padx=8, pady=3)
+            for col, ext in ((1, "csv"), (2, "xlsx")):
+                ttk.Checkbutton(export_panel, variable=self.export_flags[f"{kind}.{ext}"]).grid(
+                    row=row, column=col, sticky="w", padx=8)
+        extras = ttk.Frame(export_panel)
+        extras.grid(row=4, column=0, columnspan=3, sticky="w", pady=(5, 4))
+        for name, title in (("report.html", "Save HTML report"),
+                            ("summary.json", "Save JSON summary")):
+            ttk.Checkbutton(extras, text=title, variable=self.export_flags[name]).pack(
+                side="left", padx=(7, 18))
+        tk.Label(export_panel, text="Filename prefix (optional)", bg="#f2f6fa",
+                 font=("Segoe UI", 10)).grid(row=5, column=0, sticky="w", padx=8)
+        ttk.Entry(export_panel, textvariable=self.filename_prefix).grid(
+            row=5, column=1, columnspan=2, sticky="ew", padx=8, pady=(3, 3))
+        ttk.Label(export_panel, textvariable=self.prefix_preview).grid(
+            row=6, column=1, columnspan=2, sticky="w", padx=8)
+        export_panel.grid_columnconfigure(0, weight=1)
+        export_panel.grid_columnconfigure(2, weight=1)
+
         actions = tk.Frame(outer, bg="#f2f6fa")
         actions.pack(fill="x", pady=(5, 9))
         self.run_btn = tk.Button(actions, text="RUN DATA CLEANUP →", bg="#047d89", fg="white",
                                  relief="flat", cursor="hand2", font=("Segoe UI", 11, "bold"),
                                  padx=24, pady=12, command=self._run)
         self.run_btn.pack(side="left")
-        self.report_btn = ttk.Button(actions, text="Open HTML report",
-                                     command=self._report, state="disabled")
+        self.report_btn = ttk.Button(actions, text="View results",
+                                     command=self._show_result, state="disabled")
         self.report_btn.pack(side="left", padx=12)
         self.status = tk.StringVar(value="Select the columns to check, then run.")
         tk.Label(outer, textvariable=self.status, bg="#f2f6fa", fg="#526b7b",
@@ -209,16 +249,25 @@ class Window(TkinterDnD.Tk):
         if not self.columns:
             messagebox.showerror("Choose input", "Select CSV/XLSX files first.")
             return
+        exports = {name for name, flag in self.export_flags.items() if flag.get()}
+        if not exports:
+            messagebox.showerror("Select output", "Choose at least one output file.")
+            return
         self.report_path = None
+        self.last_result = None
         self.report_btn.configure(state="disabled")
         self.run_btn.configure(state="disabled")
         self.status.set("Processing input files...")
+        self.last_exports = exports
+        self.last_prefix = self.filename_prefix.get().strip()
+        prefix = self.last_prefix
         inputs = (self.dropped or self.input_var.get(), self.output_var.get(),
                   self.key_var.get(), self.required_var.get(), self.numeric_var.get())
 
         def worker():
             try:
-                self.events.put(("ok", process(*inputs)))
+                self.events.put(("ok", process(*inputs, exports=exports,
+                                               prefix=prefix)))
             except Exception as exc:
                 self.events.put(("error", str(exc)))
 
@@ -236,15 +285,60 @@ class Window(TkinterDnD.Tk):
             self.status.set("Processing failed; previous results have not been overwritten.")
             messagebox.showerror("CSV Batch Cleaner", result)
             return
-        self.report_path = Path(result.output_directory) / "report.html"
+        self.last_result = result
+        self.report_path = (Path(result.output_directory) /
+                            export_filename("report.html", self.last_prefix)
+                            if "report.html" in self.last_exports else None)
         self.status.set(f"Complete: {result.clean_rows} clean / {result.duplicate_rows} duplicates / "
                         f"{result.rejected_rows} rejected, from {result.input_files} files. "
                         f"Results: {result.output_directory}")
         self.report_btn.configure(state="normal")
+        self._show_result()
 
-    def _report(self):
+    def _show_result(self):
+        result = self.last_result
+        if result is None:
+            return
+        dialog = tk.Toplevel(self)
+        dialog.title("Processing results")
+        dialog.geometry("550x530")
+        dialog.transient(self)
+        frame = ttk.Frame(dialog, padding=18)
+        frame.pack(fill="both", expand=True)
+        ttk.Label(frame, text="Processing complete", font=("Segoe UI", 17, "bold")).pack(anchor="w")
+        ttk.Label(frame, text=f"{result.input_files} source files · {result.processed_rows} rows",
+                  font=("Segoe UI", 10)).pack(anchor="w", pady=(4, 13))
+        stats = ttk.Frame(frame)
+        stats.pack(fill="x")
+        for label, count in (("Clean", result.clean_rows),
+                             ("Duplicates", result.duplicate_rows),
+                             ("Rejected", result.rejected_rows)):
+            cell = ttk.Frame(stats)
+            cell.pack(side="left", expand=True, fill="x")
+            ttk.Label(cell, text=str(count), font=("Segoe UI", 21, "bold")).pack()
+            ttk.Label(cell, text=label).pack()
+        ttk.Label(frame, text="Detected issues", font=("Segoe UI", 11, "bold")).pack(
+            anchor="w", pady=(19, 5))
+        issue_list = ttk.Treeview(frame, columns=("issue", "count"), show="headings", height=6)
+        issue_list.heading("issue", text="Reason")
+        issue_list.heading("count", text="Rows")
+        issue_list.column("issue", width=360)
+        issue_list.column("count", width=70, anchor="e")
+        for name, count in result.issues.items():
+            issue_list.insert("", "end", values=(name.replace("_", " "), count))
+        issue_list.pack(fill="x")
+        ttk.Label(frame, text="Saved files", font=("Segoe UI", 11, "bold")).pack(
+            anchor="w", pady=(15, 5))
+        names = [p.name for p in sorted(Path(result.output_directory).iterdir())]
+        ttk.Label(frame, text=", ".join(names), wraplength=490, justify="left").pack(anchor="w")
+        buttons = ttk.Frame(frame)
+        buttons.pack(side="bottom", fill="x", pady=(18, 0))
+        ttk.Button(buttons, text="Open output folder", command=lambda: webbrowser.open(
+            Path(result.output_directory).as_uri())).pack(side="left")
         if self.report_path:
-            webbrowser.open(self.report_path.as_uri())
+            ttk.Button(buttons, text="Open HTML", command=lambda: webbrowser.open(
+                self.report_path.as_uri())).pack(side="left", padx=8)
+        ttk.Button(buttons, text="Close", command=dialog.destroy).pack(side="right")
 
 
 if __name__ == "__main__":

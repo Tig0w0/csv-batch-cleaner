@@ -25,6 +25,15 @@ RESERVED = (*TRACE, "__issue", "__extra_values")
 MAX_BYTES = 20 * 1024 * 1024  # per input file
 MAX_TOTAL_BYTES = 100 * 1024 * 1024
 MAX_COLUMNS = 200
+EXPORT_NAMES = frozenset(
+    f"{name}.{suffix}" for name in ("cleaned", "duplicates", "rejected")
+    for suffix in ("csv", "xlsx")
+) | {"summary.json", "report.html"}
+
+
+def export_filename(name: str, prefix: str = "") -> str:
+    return f"{prefix}_{name}" if prefix else name
+
 
 
 def normalize_header(value: str) -> str:
@@ -84,7 +93,14 @@ def _write_csv(path: Path, fields: list[str], rows: list[dict[str, str]],
 
 def process(input_dir: str | Path | list[str | Path], output_dir: str | Path,
             key: str = DEFAULT_KEY, required: str = DEFAULT_REQUIRED,
-            numeric: str = DEFAULT_NUMERIC) -> Results:
+            numeric: str = DEFAULT_NUMERIC, *,
+            exports: set[str] | None = None, prefix: str = "") -> Results:
+    prefix = prefix.strip()
+    if prefix and not re.fullmatch(r"[\w-]{1,40}", prefix):
+        raise ValueError("Filename prefix must be 1–40 letters, numbers, _ or -.")
+    exports = set(EXPORT_NAMES) if exports is None else set(exports)
+    if not exports or not exports <= EXPORT_NAMES:
+        raise ValueError("Select at least one supported output file.")
     target = Path(output_dir).resolve()
     sources = ([Path(input_dir)] if isinstance(input_dir, (str, Path))
                else [Path(p) for p in input_dir])
@@ -195,14 +211,23 @@ def process(input_dir: str | Path | list[str | Path], output_dir: str | Path,
             ("duplicates", duplicates, [*fields, "__issue"]),
             ("rejected", rejected, [*fields, "__extra_values", "__issue"]),
         ):
-            _write_csv(staging / f"{basename}.csv", exported_fields, rows, set(numeric_cols))
-            write_xlsx(staging / f"{basename}.xlsx", exported_fields, rows,
-                       set(numeric_cols), escape_csv_formula)
-        (staging / "summary.json").write_text(
-            json.dumps({**asdict(summary), "output_directory": "."}, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8"
-        )
-        (staging / "report.html").write_text(build_report(summary, files), encoding="utf-8")
+            for suffix in ("csv", "xlsx"):
+                name = f"{basename}.{suffix}"
+                if name not in exports:
+                    continue
+                path = staging / export_filename(name, prefix)
+                if suffix == "csv":
+                    _write_csv(path, exported_fields, rows, set(numeric_cols))
+                else:
+                    write_xlsx(path, exported_fields, rows,
+                               set(numeric_cols), escape_csv_formula)
+        if "summary.json" in exports:
+            (staging / export_filename("summary.json", prefix)).write_text(
+                json.dumps({**asdict(summary), "output_directory": "."},
+                           indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        if "report.html" in exports:
+            (staging / export_filename("report.html", prefix)).write_text(
+                build_report(summary, files, exports, prefix), encoding="utf-8")
         staging.rename(final)
     finally:
         if staging.exists():
@@ -210,7 +235,9 @@ def process(input_dir: str | Path | list[str | Path], output_dir: str | Path,
     return summary
 
 
-def build_report(s: Results, files: list[Path]) -> str:
+def build_report(s: Results, files: list[Path],
+                 exports: set[str] | None = None, prefix: str = "") -> str:
+    exports = set(EXPORT_NAMES) if exports is None else exports
     esc = html.escape
     pct = round(s.clean_rows * 100 / s.processed_rows, 1) if s.processed_rows else 0
     issue_rows = "".join(
@@ -222,6 +249,12 @@ def build_report(s: Results, files: list[Path]) -> str:
         for p in files
     )
     chips = "".join(f'<span class="chip">{esc(field)}</span>' for field in s.columns[:16])
+    downloads = "".join(
+        f'<a href="{esc(export_filename(name, prefix), quote=True)}">'
+        f'{esc(name.replace(".", " ").title())} ↗</a>'
+        for name in ("cleaned.csv", "cleaned.xlsx", "duplicates.csv", "duplicates.xlsx",
+                     "rejected.csv", "rejected.xlsx", "summary.json") if name in exports
+    ) or '<span>No additional files selected</span>'
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CSV & Excel Cleaner | Processing Report</title>
@@ -260,10 +293,6 @@ footer{{color:var(--muted);font-size:12px;margin:22px 4px}}@media(max-width:700p
 <section class="panel"><h2>Detected issues</h2><table>{issue_rows}</table></section>
 <section class="panel"><h2>Source files · {s.input_files}</h2><table>{input_rows}</table></section>
 <section class="panel"><h2>Normalized column names</h2><div class="columns">{chips}</div></section>
-<section class="panel"><h2>Exported deliverables</h2><div class="downloads">
-<a href="cleaned.csv">Cleaned CSV ↗</a><a href="cleaned.xlsx">Cleaned Excel ↗</a>
-<a href="duplicates.csv">Duplicates CSV ↗</a><a href="duplicates.xlsx">Duplicates Excel ↗</a>
-<a href="rejected.csv">Rejected CSV ↗</a><a href="rejected.xlsx">Rejected Excel ↗</a>
-<a href="summary.json">JSON summary ↗</a></div></section>
+<section class="panel"><h2>Exported deliverables</h2><div class="downloads">{downloads}</div></section>
 <footer>Created by CSV Batch Cleaner · Local processing only · No data is sent to external services.</footer>
 </main></body></html>"""
