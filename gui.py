@@ -103,16 +103,12 @@ class Window(TkinterDnD.Tk):
             for col, ext in ((1, "csv"), (2, "xlsx")):
                 ttk.Checkbutton(export_panel, variable=self.export_flags[f"{kind}.{ext}"]).grid(
                     row=row, column=col, sticky="w", padx=8)
-        extras = ttk.Frame(export_panel)
-        extras.grid(row=4, column=0, columnspan=3, sticky="w", pady=(5, 4))
-        ttk.Checkbutton(extras, text="Save JSON summary",
-                        variable=self.export_flags["summary.json"]).pack(side="left", padx=7)
         tk.Label(export_panel, text="Filename prefix (optional)", bg="#f2f6fa",
-                 font=("Segoe UI", 10)).grid(row=5, column=0, sticky="w", padx=8)
+                 font=("Segoe UI", 10)).grid(row=4, column=0, sticky="w", padx=8)
         ttk.Entry(export_panel, textvariable=self.filename_prefix).grid(
-            row=5, column=1, columnspan=2, sticky="ew", padx=8, pady=(3, 3))
+            row=4, column=1, columnspan=2, sticky="ew", padx=8, pady=(3, 3))
         ttk.Label(export_panel, textvariable=self.prefix_preview).grid(
-            row=6, column=1, columnspan=2, sticky="w", padx=8)
+            row=5, column=1, columnspan=2, sticky="w", padx=8)
         export_panel.grid_columnconfigure(0, weight=1)
         export_panel.grid_columnconfigure(2, weight=1)
 

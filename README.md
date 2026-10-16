@@ -22,7 +22,7 @@ Manually opening multiple spreadsheet exports, copying rows, checking missing fi
 | Case-insensitive deduplication using an ID column | Supported |
 | Source filename and original row tracking | Supported |
 | Independently select clean / duplicate / rejected results as CSV and/or XLSX | Supported |
-| In-app results dashboard and optional JSON summary | Supported |
+| In-app results dashboard after every run | Supported |
 | Optional filename prefix on all selected outputs | Supported |
 | Windows GUI and scriptable CLI | Supported |
 | No cloud uploads or paid APIs | Supported |
@@ -61,7 +61,7 @@ python gui.py
 
 1. **Drop** one or more CSV/XLSX files or folders, or select an input folder using **Browse**.
 2. Select the duplicate key and optional required/numeric checks from the detected columns.
-3. Under **Output files**, choose only the CSV/XLSX categories you need. **Save JSON summary** is optional.
+3. Under **Output files**, choose only the CSV/XLSX categories you need.
 4. Optionally enter a filename prefix, e.g. `October` → `October_cleaned.xlsx`.
 5. Click **Run Data Cleanup**. The result counts, issue reasons and saved filenames appear **inside the app**, with a button to open the output folder.
 
@@ -79,10 +79,10 @@ Use `--exports` and `--prefix` to choose the exact CLI outputs:
 
 ```bash
 python cli.py --input data/input --output data/output \
-  --exports cleaned.xlsx,rejected.csv,summary.json --prefix October
+  --exports cleaned.xlsx,rejected.csv --prefix October
 ```
 
-The CLI defaults to all seven supported files (six CSV/XLSX combinations plus JSON); GUI export choices are independent.
+The CLI defaults to all six CSV/XLSX outputs; GUI export choices are independent.
 
 For another business export, change the input/output directory and validation field names. **Every configured required or numeric column must exist in each source file.** Names are normalized consistently (for example, `Order ID` becomes `order_id`); the tool does not guess whether differently named columns have the same meaning.
 
@@ -114,9 +114,8 @@ Every run creates a **new subfolder** under the requested output folder, such as
 | `cleaned.csv` / `cleaned.xlsx` | Valid unique records |
 | `duplicates.csv` / `duplicates.xlsx` | Extra records sharing the same ID |
 | `rejected.csv` / `rejected.xlsx` | Invalid records with reasons and any overflow columns preserved |
-| `summary.json` | Machine-readable processing totals |
 
-Select individual combinations; nothing extra is exported. The in-app result summary appears after processing even without JSON output. Prefixes are optional and support letters, numbers, underscores and hyphens (up to 40 characters).
+Select individual combinations; nothing extra is exported. The in-app result summary appears automatically after processing. Prefixes are optional and support letters, numbers, underscores and hyphens (up to 40 characters).
 
 The original input files are never modified. Results are written to a staging directory first and published as a complete run folder only after every output is created successfully.
 

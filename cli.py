@@ -1,9 +1,7 @@
 """Command-line entry point for reproducible batch cleanup."""
 import argparse
 import csv
-import json
 import sys
-from dataclasses import asdict
 from cleaner import process, DEFAULT_KEY, DEFAULT_REQUIRED, DEFAULT_NUMERIC
 
 
@@ -14,7 +12,7 @@ def main() -> int:
     parser.add_argument("--key", default=DEFAULT_KEY, help="Unique record key (default: id)")
     parser.add_argument("--required", default=DEFAULT_REQUIRED, help="Comma-separated required columns")
     parser.add_argument("--numeric", default=DEFAULT_NUMERIC, help="Comma-separated numeric columns")
-    parser.add_argument("--exports", help="Comma-separated outputs, e.g. cleaned.xlsx,rejected.csv,summary.json; default: all")
+    parser.add_argument("--exports", help="Comma-separated outputs, e.g. cleaned.xlsx,rejected.csv; default: all six")
     parser.add_argument("--prefix", default="", help="Optional filename prefix (letters, digits, _ or -)")
     args = parser.parse_args()
     try:
@@ -24,7 +22,10 @@ def main() -> int:
     except (OSError, ValueError, UnicodeError, RuntimeError, csv.Error) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
-    print(json.dumps(asdict(result), indent=2))
+    print(f"Processed {result.processed_rows} rows from {result.input_files} files: "
+          f"{result.clean_rows} clean, {result.duplicate_rows} duplicate, "
+          f"{result.rejected_rows} rejected.")
+    print(f"Results: {result.output_directory}")
     return 0
 
 

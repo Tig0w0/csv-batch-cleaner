@@ -1,5 +1,4 @@
 import csv
-import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -46,7 +45,7 @@ class CleaningTests(unittest.TestCase):
         self.assertEqual(result.issues["duplicate_id"], 1)
         self.assertEqual(result.issues["invalid_number_latitude"], 1)
         self.assertEqual(result.issues["missing_id"], 1)
-        self.assertTrue(output_file(result, "summary.json").exists())
+        self.assertTrue(output_file(result, "cleaned.xlsx").exists())
         with output_file(result, "cleaned.csv").open(encoding="utf-8-sig", newline="") as fp:
             rows = list(csv.DictReader(fp))
         self.assertEqual({r["id"] for r in rows}, {"EQ1", "EQ2", "EQ4"})
@@ -289,12 +288,11 @@ class CleaningTests(unittest.TestCase):
             row = next(csv.DictReader(f))
         self.assertEqual(row["__extra_values"], '["EXTRA"]')
 
-    def test_example_summary_uses_relative_output_path(self):
+    def test_processing_summary_available_in_memory(self):
         write_csv(self.src / "one.csv", [["id"], ["A"]])
         result = process(self.src, self.out)
-        import json
-        summary = json.loads(output_file(result, "summary.json").read_text(encoding="utf-8"))
-        self.assertEqual(summary["output_directory"], ".")
+        self.assertEqual((result.processed_rows, result.clean_rows), (1, 1))
+        self.assertEqual(len(list(Path(result.output_directory).iterdir())), 6)
 
     def test_bundled_demo_without_special_mode(self):
         source = Path(__file__).resolve().parents[1] / "data" / "input"
@@ -337,14 +335,12 @@ class CleaningTests(unittest.TestCase):
         self.assertEqual(files, {"October_2026_cleaned.xlsx", "October_2026_rejected.csv"})
         self.assertEqual((result.clean_rows, result.duplicate_rows, result.rejected_rows), (1, 1, 1))
 
-    def test_optional_json_and_prefixed_filename(self):
+    def test_prefixed_files_contain_only_selected_csv_xlsx(self):
         write_csv(self.src / "one.csv", [["id"], ["A"]])
-        result = process(self.src, self.out,
-                         exports={"cleaned.csv", "summary.json"}, prefix="client_1")
-        names = {p.name for p in Path(result.output_directory).iterdir()}
-        self.assertEqual(names, {"client_1_cleaned.csv", "client_1_summary.json"})
-        summary = json.loads(output_file(result, "client_1_summary.json").read_text(encoding="utf-8"))
-        self.assertEqual((summary["clean_rows"], summary["output_directory"]), (1, "."))
+        result = process(self.src, self.out, exports={"cleaned.csv", "rejected.xlsx"},
+                         prefix="client_1")
+        self.assertEqual({p.name for p in Path(result.output_directory).iterdir()},
+                         {"client_1_cleaned.csv", "client_1_rejected.xlsx"})
 
     def test_removed_html_output_is_rejected(self):
         write_csv(self.src / "one.csv", [["id"], ["A"]])
@@ -352,7 +348,7 @@ class CleaningTests(unittest.TestCase):
             process(self.src, self.out, exports={"report.html"})
         self.assertFalse(self.out.exists())
 
-    def test_no_json_summary_is_necessary(self):
+    def test_single_output_does_not_create_extra_files(self):
         write_csv(self.src / "one.csv", [["id"], ["A"]])
         result = process(self.src, self.out, exports={"cleaned.csv"})
         self.assertEqual([p.name for p in Path(result.output_directory).iterdir()], ["cleaned.csv"])
@@ -360,6 +356,7 @@ class CleaningTests(unittest.TestCase):
     def test_invalid_output_selections_and_prefix_do_not_create_results(self):
         write_csv(self.src / "one.csv", [["id"], ["A"]])
         for kwargs in ({"exports": set()}, {"exports": {"cleaned.pdf"}}, {"exports": {"report.html"}},
+                       {"exports": {"summary.json"}},
                        {"prefix": "../unsafe"}, {"prefix": "a/b"}, {"prefix": "a" * 41}):
             with self.subTest(kwargs=kwargs):
                 with self.assertRaisesRegex(ValueError, "output|prefix"):

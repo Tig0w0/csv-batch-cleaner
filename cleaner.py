@@ -9,7 +9,7 @@ import secrets
 import shutil
 import tempfile
 from collections import Counter
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -27,7 +27,7 @@ MAX_COLUMNS = 200
 EXPORT_NAMES = frozenset(
     f"{name}.{suffix}" for name in ("cleaned", "duplicates", "rejected")
     for suffix in ("csv", "xlsx")
-) | {"summary.json"}
+)
 
 
 def export_filename(name: str, prefix: str = "") -> str:
@@ -220,10 +220,6 @@ def process(input_dir: str | Path | list[str | Path], output_dir: str | Path,
                 else:
                     write_xlsx(path, exported_fields, rows,
                                set(numeric_cols), escape_csv_formula)
-        if "summary.json" in exports:
-            (staging / export_filename("summary.json", prefix)).write_text(
-                json.dumps({**asdict(summary), "output_directory": "."},
-                           indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         staging.rename(final)
     finally:
         if staging.exists():

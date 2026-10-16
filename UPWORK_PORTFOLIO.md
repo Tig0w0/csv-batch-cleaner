@@ -6,7 +6,7 @@
 
 Built an offline Python automation tool that merges multiple CSV and Excel (XLSX) files, standardizes column names, validates required and numeric fields, removes duplicate records, and generates reviewable reports.
 
-The tool includes a Windows-friendly desktop GUI with drag-and-drop input and column selection without manual typing, a command-line interface, and an in-app data-quality results dashboard. Each run safely writes a fresh output folder. Users can independently choose CSV/XLSX formats for clean, duplicate and rejected records, add a filename prefix, and review the outcome directly in the desktop app. JSON summary export is optional.
+The tool includes a Windows-friendly desktop GUI with drag-and-drop input and column selection without manual typing, a command-line interface, and an in-app data-quality results dashboard. Each run safely writes a fresh output folder. Users can independently choose CSV/XLSX formats for clean, duplicate and rejected records, add a filename prefix, and review the outcome directly in the desktop app. The app displays the processing summary without generating a separate report file.
 
 For a reproducible demonstration, I tested three public U.S. government datasets (USGS, NOAA, Census) with clearly labeled synthetic errors: 582 records, 542 clean, 14 duplicates, and 26 rejected. Forty-one automated regression tests passed.
 
