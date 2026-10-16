@@ -85,6 +85,17 @@ python scripts/prepare_demo.py
 
 The three standardized sample files (two CSV, one XLSX) and output are included. Regeneration is optional. A separate demo-only processing mode is not needed.
 
+## More realistic test scenarios
+
+The same cleaning engine was also tested on **two additional U.S. government datasets**: NOAA daily weather readings (CSV) and U.S. Census population estimates (converted to XLSX), plus the existing USGS earthquake sample.
+
+Across six files and **582 rows**, all three independent tests returned **542 clean / 14 duplicates / 26 rejected**; separate invalid-file tests also verified safe cancellation. Deliberately corrupted rows carry `synthetic_*` labels. See [TEST_CASES.md](TEST_CASES.md) for reproducible commands, exact cases, source links, limitations and results.
+
+```bash
+python scripts/prepare_extra_cases.py
+python scripts/run_test_cases.py
+```
+
 ## Outputs
 
 Every run creates a **new subfolder** under the requested output folder, such as `data/output/run_20261016_120000_a1b2c3/`. Existing runs are never overwritten.

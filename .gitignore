@@ -11,3 +11,6 @@ venv/
 Thumbs.db
 .chrome-capture/
 data/output/
+
+# Generated per-run case reports; keep input/source fixtures and summary.
+data/test_cases/**/output/

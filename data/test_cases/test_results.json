@@ -1,0 +1,84 @@
+{
+  "results": {
+    "usgs_earthquakes": {
+      "counts": [
+        3,
+        195,
+        180,
+        6,
+        9
+      ],
+      "output": "data\\test_cases\\usgs\\output",
+      "issues": {
+        "duplicate_id": 6,
+        "invalid_number_latitude": 3,
+        "missing_id": 3,
+        "missing_time": 3
+      }
+    },
+    "noaa_weather": {
+      "counts": [
+        2,
+        166,
+        154,
+        4,
+        8
+      ],
+      "output": "data\\test_cases\\noaa\\output",
+      "issues": {
+        "duplicate_date": 4,
+        "invalid_number_prcp": 1,
+        "invalid_number_tmax": 2,
+        "malformed_csv_row": 2,
+        "missing_date": 2,
+        "missing_station": 1
+      }
+    },
+    "census_population_xlsx": {
+      "counts": [
+        1,
+        221,
+        208,
+        4,
+        9
+      ],
+      "output": "data\\test_cases\\census\\output",
+      "issues": {
+        "duplicate_record_id": 4,
+        "excel_error_cell": 1,
+        "invalid_number_population": 3,
+        "invalid_number_year": 1,
+        "malformed_excel_row": 1,
+        "missing_population": 1,
+        "missing_record_id": 1,
+        "missing_state_code": 1,
+        "missing_year": 1
+      }
+    }
+  },
+  "negative_tests": [
+    {
+      "scenario": "unclosed_csv_quote",
+      "status": "correctly_aborted",
+      "error": "broken.csv: malformed CSV near line 3: unexpected end of data"
+    },
+    {
+      "scenario": "configured_column_absent",
+      "status": "correctly_aborted",
+      "error": "wrong.csv: configured columns missing: price"
+    },
+    {
+      "scenario": "formula_in_xlsx",
+      "status": "correctly_aborted",
+      "error": "formula.xlsx: Excel formulas are not supported (row 2); export calculated values to a plain worksheet first."
+    }
+  ],
+  "totals": {
+    "files": 6,
+    "rows": 582,
+    "clean": 542,
+    "duplicates": 14,
+    "rejected": 26
+  },
+  "scope": "Three independent tasks. Synthetic errors labeled; real source snapshots preserved."
+}

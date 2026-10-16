@@ -1,0 +1,39 @@
+{
+  "attribution": {
+    "noaa": "https://www.ncei.noaa.gov/access/services/data/v1?dataset=daily-summaries&stations=USW00094728&startDate=2024-01-01&endDate=2024-05-31&dataTypes=TMAX%2CTMIN%2CPRCP&units=metric&format=csv&includeAttributes=false",
+    "census": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2024/state/totals/NST-EST2024-ALLDATA.csv"
+  },
+  "source_sha256": {
+    "noaa": "39289d5cb624254f9b7944c287c7a81e5e1180c2be3818eecf559bd2f8a6d16d",
+    "census": "b8b50bd345d8a5f33d5c8a28c95aeaa0a50971356f000d9b48276a65fd9022a7"
+  },
+  "notice": "Government source records are authentic. All test_tag=synthetic_* entries are invented for validation.",
+  "scenarios": {
+    "noaa_weather": {
+      "source": 152,
+      "injected_valid": 2,
+      "injected_duplicates": 4,
+      "injected_rejected": 8,
+      "expected": {
+        "files": 2,
+        "rows": 166,
+        "clean": 154,
+        "duplicates": 4,
+        "rejected": 8
+      }
+    },
+    "census_population_xlsx": {
+      "source": 208,
+      "injected_valid": 0,
+      "injected_duplicates": 4,
+      "injected_rejected": 9,
+      "expected": {
+        "files": 1,
+        "rows": 221,
+        "clean": 208,
+        "duplicates": 4,
+        "rejected": 9
+      }
+    }
+  }
+}
