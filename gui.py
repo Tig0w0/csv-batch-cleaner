@@ -6,8 +6,7 @@ import webbrowser
 import threading
 from queue import Empty, Queue
 
-from cleaner import (DEFAULT_KEY, DEFAULT_REQUIRED, DEFAULT_NUMERIC,
-                     DEMO_REQUIRED, DEMO_NUMERIC, process)
+from cleaner import DEFAULT_KEY, process
 
 ROOT = Path(__file__).resolve().parent
 
@@ -22,9 +21,8 @@ class Window(tk.Tk):
         self.input_var = tk.StringVar(value=str(ROOT / "data" / "input"))
         self.output_var = tk.StringVar(value=str(ROOT / "data" / "output"))
         self.key_var = tk.StringVar(value=DEFAULT_KEY)
-        self.required_var = tk.StringVar(value=DEFAULT_REQUIRED)
-        self.numeric_var = tk.StringVar(value=DEFAULT_NUMERIC)
-        self.demo_var = tk.BooleanVar(value=False)
+        self.required_var = tk.StringVar(value="id,time,latitude,longitude")
+        self.numeric_var = tk.StringVar(value="latitude,longitude,depth,magnitude")
         self.events = Queue()
         self.report_path = None
         self._build()
@@ -67,9 +65,7 @@ class Window(tk.Tk):
         self.run_btn.pack(side="left")
         self.report_btn = ttk.Button(actions, text="Open HTML report", command=self._report, state="disabled")
         self.report_btn.pack(side="left", padx=12)
-        ttk.Checkbutton(actions, text="USGS demo", variable=self.demo_var,
-                        command=self._demo).pack(side="left")
-        self.status = tk.StringVar(value="Ready. Your files remain on this computer.")
+        self.status = tk.StringVar(value="Sample files are preloaded. Edit the columns for your own data.")
         tk.Label(outer, textvariable=self.status, bg="#f2f6fa", fg="#526b7b",
                  wraplength=650, justify="left", font=("Segoe UI", 10)).pack(anchor="w")
         tk.Label(outer, text="100% offline · Python + openpyxl · No paid APIs",
@@ -87,21 +83,13 @@ class Window(tk.Tk):
             filedialog.askdirectory(initialdir=variable.get()) or variable.get()
         )).grid(row=1, column=1, padx=(8, 0), pady=(5, 0))
 
-    def _demo(self):
-        self.key_var.set(DEFAULT_KEY)
-        self.required_var.set(DEMO_REQUIRED if self.demo_var.get() else DEFAULT_REQUIRED)
-        self.numeric_var.set(DEMO_NUMERIC if self.demo_var.get() else DEFAULT_NUMERIC)
-        self.status.set("USGS demo mapping enabled." if self.demo_var.get()
-                        else "Generic validation enabled.")
-
     def _run(self):
         self.report_path = None
         self.report_btn.configure(state="disabled")
         self.run_btn.configure(state="disabled")
         self.status.set("Processing input files...")
         inputs = (self.input_var.get(), self.output_var.get(),
-                  self.key_var.get(), self.required_var.get(), self.numeric_var.get(),
-                  self.demo_var.get())
+                  self.key_var.get(), self.required_var.get(), self.numeric_var.get())
 
         def worker():
             try:

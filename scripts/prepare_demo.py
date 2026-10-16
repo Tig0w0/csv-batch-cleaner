@@ -1,60 +1,64 @@
-"""Make a reproducible English demo dataset from a USGS public-domain snapshot.
+"""Build a mixed CSV/XLSX demo from a preserved USGS public-domain snapshot.
 
-The input rows are real observations; duplicates and invalid values added below
-are intentionally synthetic, strictly for demonstrating quality checks.
+180 authentic records plus 6 synthetic duplicates and 9 synthetic invalid rows.
 """
 import csv
 from pathlib import Path
+
+from openpyxl import Workbook
 
 ROOT = Path(__file__).resolve().parents[1]
 SNAPSHOT = ROOT / "data/source/usgs_earthquakes_snapshot.csv"
 OUT = ROOT / "data/input"
 FIELDS = ("id", "time", "latitude", "longitude", "depth", "mag", "place", "status", "type")
-HEADER_VARIANTS = [
-    ("ID", "Time", "Latitude", "Longitude", "Depth", "Magnitude", "Place", "Status", "Type"),
-    ("event_id", "time", "latitude_deg", "longitude_deg", "depth", "mag", "location", "status", "type"),
-    ("id", "time", "latitude", "longitude", "depth", "magnitude", "place", "status", "type"),
-]
+HEADERS = ("id", "time", "latitude", "longitude", "depth", "magnitude", "place", "status", "type")
 
 
 def main():
-    if not SNAPSHOT.exists():
-        raise SystemExit("Download the USGS CSV snapshot first; see DATA_SOURCES.md.")
-    with SNAPSHOT.open(encoding="utf-8-sig", newline="") as fp:
-        incoming = list(csv.DictReader(fp))
-    chosen, seen = [], set()
-    for raw in incoming:
-        if (not raw.get("id") or not raw.get("time") or not raw.get("latitude")
-                or not raw.get("longitude") or raw["id"] in seen):
-            continue
-        seen.add(raw["id"])
-        chosen.append({f: raw.get(f, "").strip() for f in FIELDS})
-        if len(chosen) == 180:
-            break
-    if len(chosen) < 180:
-        raise SystemExit("Snapshot has fewer than 180 usable unique records.")
+    with SNAPSHOT.open(encoding="utf-8-sig", newline="") as handle:
+        chosen, seen = [], set()
+        for row in csv.DictReader(handle):
+            if not all(row.get(name) for name in ("id", "time", "latitude", "longitude")):
+                continue
+            if row["id"] in seen:
+                continue
+            seen.add(row["id"])
+            chosen.append([row.get(name, "").strip() for name in FIELDS])
+            if len(chosen) == 180:
+                break
+    if len(chosen) != 180:
+        raise ValueError("USGS snapshot needs at least 180 complete unique records.")
+
     OUT.mkdir(parents=True, exist_ok=True)
     for batch in range(3):
-        subset = [row.copy() for row in chosen[batch * 60:(batch + 1) * 60]]
-        for x in range(2):
-            subset.append(subset[x].copy())  # 6 clearly duplicated IDs
-        for x in range(3):
-            broken = subset[6 + x].copy()
-            broken["id"] = f"synthetic-invalid-{batch}-{x}"
-            if x == 0:
-                broken["id"] = ""
-            elif x == 1:
-                broken["latitude"] = "not-a-number"
-            elif x == 2:
-                broken["time"] = ""
-            subset.append(broken)
-        path = OUT / f"usgs_batch_{batch + 1:02d}.csv"
-        with path.open("w", newline="", encoding="utf-8") as fp:
-            writer = csv.writer(fp)
-            writer.writerow(HEADER_VARIANTS[batch])
-            writer.writerows([[row.get(field, "") for field in FIELDS] for row in subset])
-        print(f"{path.name}: {len(subset)} rows")
-    print("180 authentic source records + 6 synthetic duplicates + 9 synthetic invalid rows.")
+        rows = [item.copy() for item in chosen[batch * 60:(batch + 1) * 60]]
+        rows.extend(item.copy() for item in rows[:2])  # 6 synthetic duplicates total
+        for issue in range(3):
+            broken = rows[6 + issue].copy()
+            broken[0] = f"synthetic-invalid-{batch}-{issue}"
+            if issue == 0:
+                broken[0] = ""
+            elif issue == 1:
+                broken[2] = "not-a-number"
+            else:
+                broken[1] = ""
+            rows.append(broken)
+        if batch < 2:
+            path = OUT / f"usgs_batch_{batch + 1:02d}.csv"
+            with path.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.writer(handle)
+                writer.writerow(HEADERS)
+                writer.writerows(rows)
+        else:
+            path = OUT / "usgs_batch_03.xlsx"
+            book = Workbook(write_only=True)
+            sheet = book.create_sheet("Events")
+            sheet.append(HEADERS)
+            for row in rows:
+                sheet.append(row)
+            book.save(path)
+        print(f"{path.name}: {len(rows)} rows")
+    print("195 rows: 180 source records + 6 synthetic duplicates + 9 synthetic errors.")
 
 
 if __name__ == "__main__":

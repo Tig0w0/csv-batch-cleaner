@@ -1,4 +1,4 @@
-ID,Time,Latitude,Longitude,Depth,Magnitude,Place,Status,Type
+id,time,latitude,longitude,depth,magnitude,place,status,type
 aka2026umcroy,2026-10-16T02:12:10.856Z,55.335,-158.082,5,3.4,"92 km SE of Perryville, Alaska",automatic,earthquake
 us6000u2me,2026-10-16T01:50:44.178Z,7.6075,-80.9467,10,4.4,"12 km SSE of Tebario, Panama",reviewed,earthquake
 aka2026ulyxqn,2026-10-16T00:18:28.188Z,57.863,-154.343,59,2.6,"33 km NNE of Karluk, Alaska",automatic,earthquake

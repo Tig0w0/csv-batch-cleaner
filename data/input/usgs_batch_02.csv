@@ -1,4 +1,4 @@
-event_id,time,latitude_deg,longitude_deg,depth,mag,location,status,type
+id,time,latitude,longitude,depth,magnitude,place,status,type
 nm60628596,2026-10-14T13:31:12.510Z,36.759,-91.557,1.49,2.45,"4 km SSW of Thomasville, Missouri",reviewed,earthquake
 us6000u2a0,2026-10-14T13:19:07.599Z,38.6954,141.9302,56.594,4.4,"45 km SSE of Ōfunato, Japan",reviewed,earthquake
 aka2026ujeyit,2026-10-14T12:20:10.324Z,52.151,-174.306,195.4,3.5,"8 km SW of Atka, Alaska",reviewed,earthquake

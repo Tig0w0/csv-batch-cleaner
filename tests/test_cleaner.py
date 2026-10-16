@@ -5,8 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from cleaner import (DEFAULT_KEY, DEFAULT_REQUIRED, DEFAULT_NUMERIC,
-                     DEMO_REQUIRED, DEMO_NUMERIC, normalize_header, process)
+from cleaner import DEFAULT_KEY, DEFAULT_REQUIRED, DEFAULT_NUMERIC, normalize_header, process
 
 
 def write_csv(path, rows):
@@ -28,20 +27,20 @@ class CleaningTests(unittest.TestCase):
         self.src.mkdir()
         self.out = self.root / "output"
 
-    def test_multiple_files_aliases_duplicates_invalid(self):
+    def test_multiple_files_merge_duplicates_invalid(self):
         write_csv(self.src / "a.csv", [
-            ["ID", "Time", "Latitude", "mag"],
+            ["ID", "Time", "Latitude", "Magnitude"],
             ["EQ1", "2026-10-01", "35.1", "3.1"],
             ["EQ2", "2026-10-02", "12.0", "2.8"],
         ])
         write_csv(self.src / "b.csv", [
-            ["event_id", "time", "latitude_deg", "Magnitude"],
+            ["id", "time", "latitude", "Magnitude"],
             ["EQ1", "2026-10-01", "35.1", "3.1"],
             ["EQ3", "2026-10-03", "invalid", "3.8"],
             ["", "2026-10-04", "20.1", "4.2"],
             ["EQ4", "2026-10-05", "55.0", "5.0"],
         ])
-        result = process(self.src, self.out, "id", "id,time,latitude", "latitude,magnitude", usgs_demo=True)
+        result = process(self.src, self.out, "id", "id,time,latitude", "latitude,magnitude")
         self.assertEqual((result.processed_rows, result.clean_rows,
                           result.duplicate_rows, result.rejected_rows), (6, 3, 1, 2))
         self.assertEqual(result.issues["duplicate_id"], 1)
@@ -96,13 +95,13 @@ class CleaningTests(unittest.TestCase):
         self.assertEqual(row[2], 12.5)
 
     def test_normalize_header(self):
-        self.assertEqual(normalize_header(" Latitude Deg ", demo=True), "latitude")
-        self.assertEqual(normalize_header("Event ID", demo=True), "id")
+        self.assertEqual(normalize_header(" Latitude Deg "), "latitude_deg")
+        self.assertEqual(normalize_header("Event ID"), "event_id")
 
     def test_duplicate_headers_not_silent(self):
-        write_csv(self.src / "a.csv", [["ID", "event_id"], ["one", "two"]])
+        write_csv(self.src / "a.csv", [["ID", "id"], ["one", "two"]])
         with self.assertRaisesRegex(ValueError, "duplicate"):
-            process(self.src, self.out, usgs_demo=True)
+            process(self.src, self.out)
 
     def test_strict_unclosed_csv_quote(self):
         (self.src / "broken.csv").write_text('id,description\nONE,"hello\nTWO,world\n', encoding="utf-8")
@@ -122,11 +121,11 @@ class CleaningTests(unittest.TestCase):
         write_csv(self.src / "a.csv", [["ID", "Time", "Latitude"], ["A", "2026", "15.5"]])
         wb = Workbook()
         ws = wb.active
-        ws.append(["event_id", "time", "latitude_deg"])
+        ws.append(["id", "time", "latitude"])
         ws.append(["B", "2026", 32.4])
         ws.append(["A", "2026", 15.5])
         wb.save(self.src / "b.xlsx")
-        result = process(self.src, self.out, numeric="latitude", usgs_demo=True)
+        result = process(self.src, self.out, numeric="latitude")
         self.assertEqual((result.input_files, result.clean_rows, result.duplicate_rows), (2, 2, 1))
         workbook = load_workbook(output_file(result, "cleaned.xlsx"), read_only=True)
         try:
@@ -170,8 +169,6 @@ class CleaningTests(unittest.TestCase):
         import gui
         self.assertEqual((DEFAULT_KEY, DEFAULT_REQUIRED, DEFAULT_NUMERIC),
                          ("id", "id", ""))
-        self.assertEqual(DEMO_REQUIRED, "id,time,latitude,longitude")
-        self.assertEqual(DEMO_NUMERIC, "latitude,longitude,depth,magnitude")
         self.assertIs(gui.DEFAULT_KEY, DEFAULT_KEY)
 
     def test_corrupt_xlsx_is_handled(self):
@@ -298,6 +295,13 @@ class CleaningTests(unittest.TestCase):
         import json
         summary = json.loads(output_file(result, "summary.json").read_text(encoding="utf-8"))
         self.assertEqual(summary["output_directory"], ".")
+
+    def test_bundled_demo_without_special_mode(self):
+        source = Path(__file__).resolve().parents[1] / "data" / "input"
+        result = process(source, self.out, required="id,time,latitude,longitude",
+                         numeric="latitude,longitude,depth,magnitude")
+        self.assertEqual((result.input_files, result.processed_rows, result.clean_rows,
+                          result.duplicate_rows, result.rejected_rows), (3, 195, 180, 6, 9))
 
 
 if __name__ == "__main__":

@@ -17,7 +17,7 @@ Manually opening multiple spreadsheet exports, copying rows, checking missing fi
 | Batch import CSV and .xlsx | Supported |
 | Mixed CSV/XLSX input folder | Supported |
 | First worksheet of each .xlsx | Supported |
-| Unicode-aware header normalization; USGS aliases are opt-in | Supported |
+| Unicode-aware, consistent header normalization | Supported |
 | Required-field and numeric validation | Supported |
 | Case-insensitive deduplication using an ID column | Supported |
 | Source filename and original row tracking | Supported |
@@ -40,7 +40,7 @@ The demo begins with **180 real observations** from the U.S. Geological Survey e
 | Clean unique records | 180 |
 | Duplicates isolated | 6 |
 | Invalid records isolated | 9 |
-| Automated tests | 30 passing |
+| Automated tests | 31 passing |
 
 **All injected errors are synthetic.** The demo input and output files are not authoritative earthquake observations.
 
@@ -63,29 +63,27 @@ python gui.py
 1. Select a folder with CSV and/or XLSX files.
 2. Select a separate results folder.
 3. Set a unique key (default: `id`), required columns, and numeric columns.
-4. For the USGS sample only, enable the **USGS demo** checkbox (it also selects the demo validation fields).
-5. Click **Run Data Cleanup**, then **Open HTML report**.
+4. Click **Run Data Cleanup**, then **Open HTML report**.
 
-The default rules are general: unique key `id`, required column `id`, and no numeric columns. The USGS demo preset applies strict earthquake-field validation instead.
+The desktop app opens with the included sample folder and its validation fields prefilled. **For your own files, adjust the required/numeric columns.** The CLI retains generic defaults: unique key `id`, required `id`, and no numeric validation.
 
 ### CLI
 
 ```bash
-python cli.py --input data/mixed_input --output data/output --key id \
+python cli.py --input data/input --output data/output --key id \
   --required id,time,latitude,longitude \
-  --numeric latitude,longitude,depth,magnitude --usgs-demo
+  --numeric latitude,longitude,depth,magnitude
 ```
 
-For another business export, change the input/output directory and validation field names. **Every configured required or numeric column must exist in each source file.** For the included USGS demo use `--usgs-demo`; by default the source column `location` remains `location`, not `place`. For other datasets, adjust the explicit aliases only when needed.
+For another business export, change the input/output directory and validation field names. **Every configured required or numeric column must exist in each source file.** Names are normalized consistently (for example, `Order ID` becomes `order_id`); the tool does not guess whether differently named columns have the same meaning.
 
 ### Prepare the mixed demo
 
 ```bash
 python scripts/prepare_demo.py
-python scripts/prepare_mixed_demo.py
 ```
 
-The sample data and output are included in the repository. Regeneration is optional.
+The three standardized sample files (two CSV, one XLSX) and output are included. Regeneration is optional. A separate demo-only processing mode is not needed.
 
 ## Outputs
 
@@ -110,7 +108,7 @@ The original input files are never modified. Results are written to a staging di
 - Duplicate detection uses a single user-selected normalized column; it is not fuzzy matching.
 - Empty numeric cells are allowed unless the corresponding column is also marked required.
 - A malformed CSV syntax error aborts processing without publishing a partial output folder. Rows with the wrong number of fields are sent to rejected outputs when they can be parsed.
-- Header mapping is deterministic and Unicode-aware. USGS-specific aliases apply only in demo mode.
+- Header normalization is deterministic and Unicode-aware. Different semantic names are never implicitly merged.
 - Excel cells with a simple leading-zero format (e.g. `000123`) are preserved as text. Very long numeric CSV values are exported as text to avoid Excel's ~15-digit precision limit; numbers *already rounded by Excel in the source file* cannot be recovered.
 - Excel lock files and format-only trailing columns are ignored. Native Excel error cells are rejected.
 - CSV and XLSX outputs protect text resembling spreadsheet formulas by escaping them.
@@ -122,7 +120,7 @@ The original input files are never modified. Results are written to a staging di
 python -m unittest discover -s tests -v
 ```
 
-Tests cover CSV/XLSX input, identifiers and precision, signed numbers, Unicode headers, opt-in aliases, Excel lock/error/styled cells, invalid CSV syntax, overflow cells, output isolation and validation defaults.
+Tests cover CSV/XLSX input, identifiers and precision, signed numbers, Unicode headers, Excel lock/error/styled cells, invalid CSV syntax, overflow cells, output isolation and validation defaults.
 
 ## Repository structure
 
@@ -132,10 +130,9 @@ spreadsheet_io.py     CSV and XLSX reading / XLSX writing
 gui.py                Tkinter frontend
 cli.py                command-line frontend
 tests/                automated regression tests
-scripts/              demo data preparation and GUI screenshot helper
+scripts/              single demo-data preparation script
 data/source/          preserved original USGS feed snapshot
-data/input/           reproducible CSV examples
-data/mixed_input/     2 CSV + 1 XLSX examples
+data/input/           2 CSV + 1 XLSX examples
 data/output/          generated runtime folders (ignored by Git)
 data/example_output/  committed output from a successful mixed-format run
 assets/               real screenshots of the GUI and report

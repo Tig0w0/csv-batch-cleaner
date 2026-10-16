@@ -20,20 +20,6 @@ from spreadsheet_io import read_header, read_records, write_xlsx
 DEFAULT_KEY = "id"
 DEFAULT_REQUIRED = "id"
 DEFAULT_NUMERIC = ""
-DEMO_REQUIRED = "id,time,latitude,longitude"
-DEMO_NUMERIC = "latitude,longitude,depth,magnitude"
-
-# Explicit demonstration aliases. Other datasets can supply matching headers.
-DEMO_ALIASES = {
-    "event_id": "id",
-    "eventid": "id",
-    "latitude_deg": "latitude",
-    "longitude_deg": "longitude",
-    "mag": "magnitude",
-    "mag_value": "magnitude",
-    "mag_type": "magnitude_type",
-    "location": "place",
-}
 TRACE = ("__source_file", "__source_row")
 RESERVED = (*TRACE, "__issue", "__extra_values")
 MAX_BYTES = 20 * 1024 * 1024  # per input file
@@ -41,13 +27,12 @@ MAX_TOTAL_BYTES = 100 * 1024 * 1024
 MAX_COLUMNS = 200
 
 
-def normalize_header(value: str, demo: bool = False) -> str:
-    name = re.sub(r"[^\w]+", "_", value.strip().casefold()).strip("_")
-    return DEMO_ALIASES.get(name, name) if demo else name
+def normalize_header(value: str) -> str:
+    return re.sub(r"[^\w]+", "_", value.strip().casefold()).strip("_")
 
 
-def split_columns(value: str, demo: bool = False) -> list[str]:
-    return list(dict.fromkeys(normalize_header(x, demo) for x in value.split(",") if x.strip()))
+def split_columns(value: str) -> list[str]:
+    return list(dict.fromkeys(normalize_header(x) for x in value.split(",") if x.strip()))
 
 
 def escape_csv_formula(value: str) -> str:
@@ -99,7 +84,7 @@ def _write_csv(path: Path, fields: list[str], rows: list[dict[str, str]],
 
 def process(input_dir: str | Path, output_dir: str | Path,
             key: str = DEFAULT_KEY, required: str = DEFAULT_REQUIRED,
-            numeric: str = DEFAULT_NUMERIC, usgs_demo: bool = False) -> Results:
+            numeric: str = DEFAULT_NUMERIC) -> Results:
     source, target = Path(input_dir).resolve(), Path(output_dir).resolve()
     if not source.is_dir():
         raise ValueError("Input directory does not exist.")
@@ -111,11 +96,11 @@ def process(input_dir: str | Path, output_dir: str | Path,
     if not files:
         raise ValueError("No CSV/XLSX files found in the input directory.")
     total_bytes = 0
-    key = normalize_header(key, usgs_demo)
+    key = normalize_header(key)
     if not key or key in RESERVED:
         raise ValueError("Invalid deduplication key.")
-    required_cols = list(dict.fromkeys([key, *split_columns(required, usgs_demo)]))
-    numeric_cols = split_columns(numeric, usgs_demo)
+    required_cols = list(dict.fromkeys([key, *split_columns(required)]))
+    numeric_cols = split_columns(numeric)
     for column in [*required_cols, *numeric_cols]:
         if column in RESERVED or not column:
             raise ValueError("Invalid validation column.")
@@ -130,7 +115,7 @@ def process(input_dir: str | Path, output_dir: str | Path,
         total_bytes += size
         if size > MAX_BYTES or total_bytes > MAX_TOTAL_BYTES:
             raise ValueError("Input too large (20 MB/file, 100 MB total).")
-        fields = [normalize_header(value, usgs_demo) for value in read_header(file)]
+        fields = [normalize_header(value) for value in read_header(file)]
         if not fields or not all(fields) or len(fields) != len(set(fields)):
             raise ValueError(f"{file.name}: empty or duplicate header names.")
         if len(fields) > MAX_COLUMNS or any(field in RESERVED for field in fields):

@@ -21,7 +21,7 @@ USGS states that data wholly created by U.S. federal employees during official d
 
 ## Transformation and synthetic issues
 
-`scripts/prepare_demo.py` deterministically selects the first **180 unique source records** with valid IDs, timestamps and coordinates, splits them into three **English-language CSV files**, and changes header spellings to simulate common export inconsistencies.
+`scripts/prepare_demo.py` deterministically selects the first **180 unique source records** with valid IDs, timestamps and coordinates, splits them into **two CSV files and one XLSX file** with the same English column names, removing any need for demo-only header mapping inside the app.
 
 For testing *only*, it then adds:
 - 6 copied records with duplicate event IDs
@@ -31,7 +31,7 @@ For testing *only*, it then adds:
 
 **The added errors are synthetic, not USGS observations.**
 
-`data/input/` and `data/output/` are modified illustrative datasets; never use them for research or hazard decisions.
+`data/input/` and `data/example_output/` are modified illustrative datasets; never use them for research or hazard decisions.
 
 ## Software license
 
